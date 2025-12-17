@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KampüsGurme Statistics</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#38e07b",
+                        "primary-hover": "#2ccb6b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0f172a","surface-dark": "#1e293b","surface-darker": "#111714","accent-danger": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="w-72 hidden lg:flex flex-col bg-surface-dark border-r border-slate-700/50 h-full p-6 justify-between shrink-0 z-20">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2">
+<div class="relative flex items-center justify-center size-10 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-2xl">restaurant_menu</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-white">KampüsGurme</h1>
+<p class="text-slate-400 text-xs">University Dining Social</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">home</span>
+<span class="font-medium text-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">menu_book</span>
+<span class="font-medium text-sm">Food Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">bar_chart</span>
+<span class="font-medium text-sm">Statistics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">favorite</span>
+<span class="font-medium text-sm">My Favorites</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">trophy</span>
+<span class="font-medium text-sm">Leaderboard</span>
+</a>
+</nav>
+</div>
+<div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+<div class="flex items-center gap-3 mb-3">
+<div class="size-10 rounded-full bg-cover bg-center border-2 border-primary" data-alt="User profile picture of a young male student" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCog0WnrL-nTiHp74sAdcB_RYI5HcOX8KxGhI5fBt0Y-_Os07AqOVyZm-fexQXPyqG3A4_2DGyzKgqVISH5eW81czipNBR-2vmHjg2KJiXDl6MOtvRKRC4nHqSN8qyrQFtS4HI-u48256xcgmuBHf2wOMGuOA1cKy5tNRYoj9uQW7jcg4EB8jRdUMnfZA6ttrRa-4AyxBUfYLTASG7T3phP45hbtsILHhWBDUEVV81IjwLcKM29t2VhIVrezAx7VodLhBYFzDSV0wdS');"></div>
+<div class="flex flex-col">
+<span class="text-white text-sm font-bold">Emre Yılmaz</span>
+<span class="text-primary text-xs font-medium">Kampüs Gurmesi</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between text-[10px] text-slate-400 font-medium">
+<span>Lvl 5</span>
+<span>1250 / 1500 XP</span>
+</div>
+<div class="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[83%] rounded-full shadow-[0_0_10px_rgba(56,224,123,0.5)]"></div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-y-auto relative scroll-smooth">
+<header class="sticky top-0 z-10 bg-background-dark/95 backdrop-blur-md border-b border-slate-700/50 px-6 py-4 flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="text-2xl font-bold text-white tracking-tight">Your Analytics</h2>
+<p class="text-slate-400 text-sm flex items-center gap-1">
+                        Track your dining habits and ratings
+                    </p>
+</div>
+<div class="flex items-center gap-4">
+<button class="lg:hidden p-2 text-white bg-slate-800 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex bg-slate-800 rounded-full p-1 items-center border border-slate-700">
+<span class="px-4 py-1.5 rounded-full bg-slate-700 text-sm font-medium text-white shadow-sm cursor-pointer">This Semester</span>
+<span class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white cursor-pointer transition-colors">Last Month</span>
+<span class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white cursor-pointer transition-colors">All Time</span>
+</div>
+</div>
+</header>
+<div class="p-6 pb-20 max-w-6xl mx-auto w-full flex flex-col gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-surface-dark p-5 rounded-2xl border border-slate-700/50 flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">restaurant</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-wider">
+                            Total Meals
+                        </div>
+<div class="text-3xl font-bold text-white">142</div>
+<div class="flex items-center gap-1 text-xs text-primary font-medium">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +12% vs last month
+                        </div>
+</div>
+<div class="bg-surface-dark p-5 rounded-2xl border border-slate-700/50 flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-yellow-400">star</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-wider">
+                            Avg Rating Given
+                        </div>
+<div class="text-3xl font-bold text-white">4.2</div>
+<div class="flex items-center gap-1 text-xs text-slate-400 font-medium">
+<span class="text-white">58</span> reviews submitted
+                        </div>
+</div>
+<div class="bg-surface-dark p-5 rounded-2xl border border-slate-700/50 flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-blue-400">savings</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-wider">
+                            Money Saved
+                        </div>
+<div class="text-3xl font-bold text-white">₺3,250</div>
+<div class="flex items-center gap-1 text-xs text-slate-400 font-medium">
+                            vs. eating out
+                        </div>
+</div>
+<div class="bg-surface-dark p-5 rounded-2xl border border-slate-700/50 flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-purple-400">local_fire_department</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-wider">
+                            Total Calories
+                        </div>
+<div class="text-3xl font-bold text-white">98k</div>
+<div class="flex items-center gap-1 text-xs text-slate-400 font-medium">
+<span class="text-white">Avg. 690</span> per meal
+                        </div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 bg-surface-dark p-6 rounded-2xl border border-slate-700/50 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h3 class="text-white font-bold text-lg">Dining Frequency</h3>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 flex items-end justify-between gap-2 h-64 pt-4 border-b border-slate-700/50 pb-2 relative">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
+<div class="w-full h-px bg-slate-700/30 border-dashed border-t border-slate-700/30"></div>
+<div class="w-full h-px bg-slate-700/30 border-dashed border-t border-slate-700/30"></div>
+<div class="w-full h-px bg-slate-700/30 border-dashed border-t border-slate-700/30"></div>
+<div class="w-full h-px bg-slate-700/30 border-dashed border-t border-slate-700/30"></div>
+<div class="w-full h-px bg-slate-700/30 border-dashed border-t border-slate-700/30"></div>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-primary/60 group-hover:bg-primary h-[40%] rounded-t-lg transition-all duration-500"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">4</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Mon</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-primary/60 group-hover:bg-primary h-[65%] rounded-t-lg transition-all duration-500"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">7</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Tue</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-primary/60 group-hover:bg-primary h-[85%] rounded-t-lg transition-all duration-500"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">9</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Wed</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-primary/60 group-hover:bg-primary h-[50%] rounded-t-lg transition-all duration-500"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">5</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Thu</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-primary/60 group-hover:bg-primary h-[30%] rounded-t-lg transition-all duration-500"></div>
+<div class="absolute -top-8 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">3</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Fri</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer opacity-50">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-slate-500 h-[10%] rounded-t-lg transition-all duration-500"></div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Sat</span>
+</div>
+<div class="w-full flex flex-col items-center gap-2 z-10 group cursor-pointer opacity-50">
+<div class="w-full bg-slate-700/30 h-full rounded-t-lg relative flex items-end justify-center group-hover:bg-slate-700/50 transition-colors">
+<div class="w-full mx-1 bg-slate-500 h-[0%] rounded-t-lg transition-all duration-500"></div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Sun</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-dark p-6 rounded-2xl border border-slate-700/50 flex flex-col gap-4">
+<h3 class="text-white font-bold text-lg">Rating Habits</h3>
+<div class="flex flex-col gap-3 justify-center h-full">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 w-12 shrink-0">
+<span class="text-white text-sm font-bold">5</span>
+<span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+</div>
+<div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-400 rounded-full" style="width: 35%"></div>
+</div>
+<span class="text-xs text-slate-400 w-8 text-right">35%</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 w-12 shrink-0">
+<span class="text-white text-sm font-bold">4</span>
+<span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+</div>
+<div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-400 rounded-full" style="width: 45%"></div>
+</div>
+<span class="text-xs text-slate-400 w-8 text-right">45%</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 w-12 shrink-0">
+<span class="text-white text-sm font-bold">3</span>
+<span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+</div>
+<div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-400 rounded-full" style="width: 15%"></div>
+</div>
+<span class="text-xs text-slate-400 w-8 text-right">15%</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 w-12 shrink-0">
+<span class="text-white text-sm font-bold">2</span>
+<span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+</div>
+<div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-400 rounded-full" style="width: 4%"></div>
+</div>
+<span class="text-xs text-slate-400 w-8 text-right">4%</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 w-12 shrink-0">
+<span class="text-white text-sm font-bold">1</span>
+<span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+</div>
+<div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-400 rounded-full" style="width: 1%"></div>
+</div>
+<span class="text-xs text-slate-400 w-8 text-right">1%</span>
+</div>
+</div>
+<div class="mt-2 pt-4 border-t border-slate-700/50">
+<p class="text-xs text-slate-400 text-center">You are generally <span class="text-primary font-bold">more positive</span> than the average student.</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h3 class="text-white font-bold text-lg">Most Eaten Dishes</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="flex items-center gap-4 bg-surface-dark p-4 rounded-xl border border-slate-700/50 hover:border-primary/30 transition-colors">
+<div class="size-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAf12wuWh70ar4GLHAgNYkP-wSq-GzEQpsgJCr7O6QHNFLPjiPgrSQvYcYvvQBi-dWGXzBx8VicI0Ky8pwlslke-ekhlRwsz30MGtUKjliriB7i8wwCOgB4CcEcjGHz62Gg5wqMjwle7hYJ5EMrpDpBfgUuwt4cd3iUW2EAF4akViq4tDhZVziiX-wzYPRTaJueP8D2L_cPjnBjpZnCD2YSmctOXLnPMBaGD7OkYOpmcqH6URUGwo8LjG28Jt5aVVsY5r0pqxVRG5pn');"></div>
+<div class="flex flex-col gap-1">
+<h4 class="text-white font-bold text-sm">Mercimek Çorbası</h4>
+<div class="flex items-center gap-2">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded">18 times</span>
+<div class="flex gap-0.5 text-yellow-400 text-[10px]">
+<span class="material-symbols-outlined text-sm">star</span> 5.0
+                                    </div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-dark p-4 rounded-xl border border-slate-700/50 hover:border-primary/30 transition-colors">
+<div class="size-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCWq7J4sfkJS4_I1e0P6JQm0jPgaV_93GYb6XV8b_cxm43a3A9FfyNNy8OFrvT1t9JsCaXwkkEMjsjY1wqvH6nBToyZ4F-RkXEgzEBQvyoWXgd0m-BPO-RUYhCKilj2NH11NYK8Ibzp0Jred_BFUCGAoPBJlDQIJssb9PxmPDojd3FTt2upQJfaNcM1494dK-TSVjlm6wszi-5Wo1_mUvoOB-f7NtZ-JILGoou0LajOexK0_E4rA1ZL9oPTq4M8usG2Y_WDYAt8oL0M');"></div>
+<div class="flex flex-col gap-1">
+<h4 class="text-white font-bold text-sm">Orman Kebabı</h4>
+<div class="flex items-center gap-2">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded">12 times</span>
+<div class="flex gap-0.5 text-yellow-400 text-[10px]">
+<span class="material-symbols-outlined text-sm">star</span> 4.5
+                                    </div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-dark p-4 rounded-xl border border-slate-700/50 hover:border-primary/30 transition-colors">
+<div class="size-16 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvJ993Scyp-3CEtTNK04GOaOSaAgutAIvhOFGj1oSiOtd57-uQOwgaG3CuflNJbErFDTPzaH4lxUHiZtfE8O7iWfVh4yRKNzYA_p_DMn6dJrdXHuRzmaad9dJ1edV1tODiNGy4QHSg48vUX0iYT5m9gnEEBWnOjipvc8CWNXuTB-KvJvKAs5OU2EnRgODbCcZKRS80Tra4zgw61EbsfLMcSStLyHxOprjL329MOjBvohUENBCALnP9rZVXN9449kFD1tCp_sUq64Qc');"></div>
+<div class="flex flex-col gap-1">
+<h4 class="text-white font-bold text-sm">Pirinç Pilavı</h4>
+<div class="flex items-center gap-2">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded">10 times</span>
+<div class="flex gap-0.5 text-yellow-400 text-[10px]">
+<span class="material-symbols-outlined text-sm">star</span> 3.5
+                                    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<aside class="w-80 hidden xl:flex flex-col bg-surface-dark border-l border-slate-700/50 h-full p-6 shrink-0 gap-6 z-20">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-white font-bold text-lg">Next Reward</h3>
+</div>
+<div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-5 border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.1)] relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-10">
+<span class="material-symbols-outlined text-6xl text-white">emoji_events</span>
+</div>
+<div class="relative z-10 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/30">
+<span class="material-symbols-outlined text-2xl">health_and_safety</span>
+</div>
+<div>
+<div class="text-white font-bold">Health Nut</div>
+<div class="text-slate-400 text-xs">Badge</div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs text-slate-300">
+<span>Eat 5 Salads</span>
+<span>3 / 5</span>
+</div>
+<div class="w-full bg-slate-700 rounded-full h-2">
+<div class="bg-indigo-500 h-2 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 60%"></div>
+</div>
+</div>
+<p class="text-indigo-200 text-xs mt-1">Reward: +200 XP &amp; 'Healthy' Profile Tag</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4 flex-1">
+<h3 class="text-white font-bold text-lg">Weekly Nutrition</h3>
+<div class="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-blue-500/20 text-blue-400 p-2 rounded-lg">
+<span class="material-symbols-outlined">local_fire_department</span>
+</div>
+<div class="flex flex-col flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="text-slate-300 text-xs font-medium">Calories</span>
+<span class="text-white text-xs font-bold">2,100 / 2,500</span>
+</div>
+<div class="w-full bg-slate-700 h-1.5 rounded-full">
+<div class="bg-blue-500 h-1.5 rounded-full" style="width: 84%"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-purple-500/20 text-purple-400 p-2 rounded-lg">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<div class="flex flex-col flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="text-slate-300 text-xs font-medium">Protein</span>
+<span class="text-white text-xs font-bold">85g / 120g</span>
+</div>
+<div class="w-full bg-slate-700 h-1.5 rounded-full">
+<div class="bg-purple-500 h-1.5 rounded-full" style="width: 70%"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-orange-500/20 text-orange-400 p-2 rounded-lg">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div class="flex flex-col flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="text-slate-300 text-xs font-medium">Water</span>
+<span class="text-white text-xs font-bold">1.5L / 3L</span>
+</div>
+<div class="w-full bg-slate-700 h-1.5 rounded-full">
+<div class="bg-orange-500 h-1.5 rounded-full" style="width: 50%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h3 class="text-white font-bold text-lg">Top Gourmets</h3>
+<a class="text-primary text-xs font-bold hover:underline" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/30 hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-700">
+<div class="flex items-center gap-3">
+<span class="text-primary font-bold text-sm w-4">1</span>
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of top user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAV-VdM4LFhHlt0wAH1I8SvC7VlX4ndq1_ER1tlqEP_jfDU2FLHAQXMcu1gxZbuCU2aeda3PNph1SKX1wvp78kaasMldnCM-kvROc7bsheKWZqttz4pu2Mt0GVj6dzWRXu9hVRO0ZwZqz4C99BA60DdRceg9uArHCXLGZW7LGHKYr_Zdn46Gps2bLmXp91Y6qwjrGbLQE6j2JVHR8M6CgfBIJ48mtvZ7spLBMZTneZ5pl3OsvksP4Oyj8r6qH19-5mQv9Pw6VxMsC8p')"></div>
+<span class="text-slate-200 text-sm font-medium">Ayşe K.</span>
+</div>
+<span class="text-xs text-slate-400">15.2k XP</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/30 hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-700">
+<div class="flex items-center gap-3">
+<span class="text-slate-400 font-bold text-sm w-4">2</span>
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of second user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLVkqKBHKaNbynFMH5CAlTauSwQIcoLH5XwV6Ev8XFdH35Q2aHhbyXMm47BZDGC3fXqz7PdM0_YgRuQY1jtYkH_T3sgRALmsVzV4wtkIicnkCuSNUzJn2WWxqO9CJFaGzpc98hsl1OoYXIhH_CX4qqKLAL94E0GFSTHbGJj4tDzFInBsGOE5InYA5NbyljQP2iEThL-9TeAp9RVZOpB8aU7UZlFOpbjCumCv6f0_BEfJZ_rEUsAKYX3WTYZIUbitpG4omxMnuYLK9B')"></div>
+<span class="text-slate-200 text-sm font-medium">Mehmet D.</span>
+</div>
+<span class="text-xs text-slate-400">14.8k XP</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/30 hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-700">
+<div class="flex items-center gap-3">
+<span class="text-slate-500 font-bold text-sm w-4">3</span>
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of third user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATLfTQ2P8fcilnNccNNygfDtl0hBFnhtuljmz3n2IrGoO6GLXUeEHU4SSmQB4yNoyyJQM91Js-TdV-pOQ-h1o_vbAahdcSzqiuRQsxAxMNIDtFh60FGUgEP5xR8zELvp6k6j_wdFDLbUyI35im39f7uVfJGmD2OLr0qdIKO12f8BhCE3mgTT_2MabnZP_RjpGbZhbwCNxKT_d597gm-DTKtHtyngDiMUFq93RfLOvFDD8fjMQE4XfBXdmVQv0Ajjk7hdIp-Q3zvva4')"></div>
+<span class="text-slate-200 text-sm font-medium">Caner T.</span>
+</div>
+<span class="text-xs text-slate-400">12.1k XP</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+
+</body></html>
