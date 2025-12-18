@@ -1,0 +1,17 @@
+# Security (Secrets)
+.env
+
+# Virtual Environment
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Database
+db.sqlite3
+
+# OS Trash
+.DS_Store
+Thumbs.db
