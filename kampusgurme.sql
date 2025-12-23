@@ -96,3 +96,5 @@ CREATE TABLE "ACTION_LOG" (
     xp_gained INT NOT NULL, -- isim degisikligi
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER SEQUENCE "USER_user_id_seq" RESTART WITH 100;

@@ -1,3 +1,201 @@
 from django.db import models
 
-# Create your models here.
+class ActionConfig(models.Model):
+    action_id = models.AutoField(primary_key=True)
+    action_name = models.CharField(max_length=100, verbose_name="Action Name")
+    xp_value = models.IntegerField(verbose_name="XP Value")
+
+    class Meta:
+        managed = False
+        db_table = 'ACTION_CONFIG'
+        verbose_name = 'Action Rule'
+        verbose_name_plural = 'Action Rules'
+
+    def __str__(self):
+        return self.action_name
+
+
+class Rank(models.Model):
+    rank_id = models.AutoField(primary_key=True)
+    rank_name = models.CharField(unique=True, max_length=50, verbose_name="Rank Name")
+    min_xp = models.IntegerField(verbose_name="Minimum XP")
+    icon_url = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'RANK'
+        verbose_name = 'Rank'
+        verbose_name_plural = 'Ranks'
+
+    def __str__(self):
+        return self.rank_name
+
+
+class User(models.Model):
+    user_id = models.AutoField(primary_key=True)
+    email = models.CharField(unique=True, max_length=100)
+    password_hash = models.CharField(max_length=255)
+    username = models.CharField(unique=True, max_length=50)
+    role = models.CharField(max_length=20)
+    total_xp = models.IntegerField(blank=True, null=True, default=0, verbose_name="Total XP")
+    rank = models.ForeignKey(Rank, models.SET_NULL, blank=True, null=True, verbose_name="Rank") 
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'USER'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+
+    def __str__(self):
+        return self.username
+
+
+class ActionLog(models.Model):
+    log_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
+    action = models.ForeignKey(ActionConfig, models.CASCADE, blank=True, null=True)
+    xp_gained = models.IntegerField(verbose_name="XP Gained")
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ACTION_LOG'
+        verbose_name = 'Action Log'
+        verbose_name_plural = 'Action Logs'
+
+
+class Allergen(models.Model):
+    allergen_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, verbose_name="Allergen Name")
+
+    class Meta:
+        managed = False
+        db_table = 'ALLERGEN'
+        verbose_name = 'Allergen'
+        verbose_name_plural = 'Allergens'
+    
+    def __str__(self):
+        return self.name
+
+
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    name = models.CharField(unique=True, max_length=50, verbose_name="Category Name")
+
+    class Meta:
+        managed = False
+        db_table = 'CATEGORY'
+        # İŞTE DÜZELTİLEN YER:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+    
+    def __str__(self):
+        return self.name
+
+
+class DailyMenu(models.Model):
+    menu_id = models.AutoField(primary_key=True)
+    menu_date = models.DateField(unique=True, verbose_name="Menu Date")
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'DAILY_MENU'
+        ordering = ['-menu_date']
+        verbose_name = 'Daily Menu'
+        verbose_name_plural = 'Daily Menus'
+
+    def __str__(self):
+        return str(self.menu_date)
+
+
+class Meal(models.Model):
+    meal_id = models.AutoField(primary_key=True)
+    category = models.ForeignKey(Category, models.SET_NULL, blank=True, null=True)
+    name = models.CharField(max_length=100, verbose_name="Meal Name")
+    description = models.TextField(blank=True, null=True)
+    image_url = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'MEAL'
+        verbose_name = 'Meal'
+        verbose_name_plural = 'Meals'
+
+    def __str__(self):
+        return self.name
+
+
+class ItemRating(models.Model):
+    rating_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
+    menu = models.ForeignKey(DailyMenu, models.CASCADE, blank=True, null=True)
+    meal = models.ForeignKey(Meal, models.CASCADE, blank=True, null=True)
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ITEM_RATING'
+        verbose_name = 'Item Rating'
+        verbose_name_plural = 'Item Ratings'
+
+
+class MealNutrition(models.Model):
+    meal = models.OneToOneField(Meal, models.CASCADE, primary_key=True)
+    calories = models.IntegerField(blank=True, null=True)
+    protein = models.IntegerField(blank=True, null=True)
+    carbs = models.IntegerField(blank=True, null=True)
+    fat = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'MEAL_NUTRITION'
+        verbose_name = 'Meal Nutrition Info'
+        verbose_name_plural = 'Meal Nutrition Info'
+
+
+class UserComment(models.Model):
+    comment_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
+    menu = models.ForeignKey(DailyMenu, models.CASCADE, blank=True, null=True)
+    subject_meal = models.ForeignKey(Meal, models.CASCADE, blank=True, null=True)
+    comment_text = models.TextField()
+    comment_image_url = models.CharField(max_length=255, blank=True, null=True)
+    upvotes = models.IntegerField(blank=True, null=True, default=0)
+    downvotes = models.IntegerField(blank=True, null=True, default=0)
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'USER_COMMENT'
+        ordering = ['-created_at']
+        verbose_name = 'User Comment'
+        verbose_name_plural = 'User Comments'
+
+
+# Ara tablolar (Admin panelinde gizli kalacaksa isimleri çok dert değil ama düzgün dursun)
+class MealAllergen(models.Model):
+    pk = models.CompositePrimaryKey('meal_id', 'allergen_id')
+    meal = models.ForeignKey(Meal, models.CASCADE)
+    allergen = models.ForeignKey(Allergen, models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'MEAL_ALLERGEN'
+        unique_together = (('meal', 'allergen'),)
+        verbose_name = 'Meal-Allergen Link'
+        verbose_name_plural = 'Meal-Allergen Links'
+
+class MenuContent(models.Model):
+    pk = models.CompositePrimaryKey('menu_id', 'meal_id')
+    menu = models.ForeignKey(DailyMenu, models.CASCADE)
+    meal = models.ForeignKey(Meal, models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'MENU_CONTENT'
+        unique_together = (('menu', 'meal'),)
+        verbose_name = 'Menu Content'
+        verbose_name_plural = 'Menu Contents'
