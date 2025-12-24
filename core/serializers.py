@@ -26,7 +26,7 @@ class DailyMenuSerializer(serializers.ModelSerializer):
         model = DailyMenu
         fields = ['menu_id', 'menu_date', 'meals']
     def get_meals(self, obj):
-        menu_contents = MenuContent.objects.filter(menu=obj)
+        menu_contents = MenuContent.objects.filter(menu=obj) # get all the meals from specific MenuContent record
         meals = [content.meal for content in menu_contents] # all in one
         return MealSerializer(meals, many=True).data
 
