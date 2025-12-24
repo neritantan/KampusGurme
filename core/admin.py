@@ -1,34 +1,31 @@
 from django.contrib import admin
 from .models import *
 
-# --- 1. AYAR VE TANIM TABLOLARI ---
+# --- SETTINGS AND DEFINITION TABLES ---
 admin.site.register(Rank)
 admin.site.register(Category)
 admin.site.register(Allergen)
 admin.site.register(ActionConfig)
 
-# --- 2. YEMEK MENÜSÜ AYARLARI (Özel Kısım) ---
-
-# Bu ayar sayesinde Menü sayfasına girince altta yemek ekleyebileceksin
+# --- MENU CONTENT ---
+# for making it easier to add meals to daily menu
 class MenuContentInline(admin.TabularInline):
     model = MenuContent
-    extra = 1 # Kaç tane boş satır göstersin
+    extra = 1 
 
 class DailyMenuAdmin(admin.ModelAdmin):
-    inlines = [MenuContentInline] # Yukarıdaki ayarı buraya gömüyoruz
-    list_display = ['menu_date', 'created_at'] # Listede tarihi göster
+    inlines = [MenuContentInline] # daily menu icine gomuluyor
+    list_display = ['menu_date', 'created_at'] 
 
-# Günlük Menüyü özel ayarıyla kaydediyoruz
 admin.site.register(DailyMenu, DailyMenuAdmin)
 
-
-# --- 3. DİĞER TABLOLAR ---
+# --- OTHER TABLES ---
 admin.site.register(User)
 admin.site.register(Meal)
-# admin.site.register(MealNutrition) # Hata verirse bunu kapatırsın
-# admin.site.register(MealAllergen)  # Hata verirse bunu kapatırsın
+# admin.site.register(MealNutrition) # gives error due to version
+# admin.site.register(MealAllergen)  # gives error due to version
 
-# --- 4. KULLANICI ETKİLEŞİMLERİ ---
+# --- USER INTERACTIONS ---
 admin.site.register(UserComment)
 admin.site.register(ItemRating)
 admin.site.register(ActionLog)
