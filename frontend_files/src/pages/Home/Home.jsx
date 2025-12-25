@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getDailyMenu } from '../../services/menuService';
 import CommentsModal from '../../components/modals/CommentsModal';
 
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Takvimden gelen veriyi yakalamak için
   
   // --- STATE'LER ---
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 26));
+  
+  // Tarih Başlangıcı: Eğer takvimden geldiyse o tarihi, yoksa 26 Aralık'ı al
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (location.state && location.state.date) {
+        return location.state.date;
+    }
+    return new Date(2025, 11, 26);
+  });
+
   const [menu, setMenu] = useState(null);
   const [nutrition, setNutrition] = useState({ kcal: 0, prot: 0, carb: 0, fat: 0 });
   
@@ -16,10 +25,10 @@ const Home = () => {
   const [userRatings, setUserRatings] = useState({});
   const [toast, setToast] = useState({ show: false, message: '' });
 
-  // Yorumlar Listesi (userVote: 'up', 'down' veya null)
+  // Yorumlar Listesi
   const [comments, setComments] = useState([
     { id: 3, user: '@ayse_nur', time: '1s önce', text: 'Çorba biraz tuzluydu, ama pilav tane taneydi.', targetName: 'Mercimek Çorbası', upvotes: 2, downvotes: 0, userVote: null },
-    { id: 2, user: '@ahmet_y', time: '10dk önce', text: 'Tavuk efsaneydi ama Kemalpaşa\'nın şerbeti çok azdı.', targetName: 'Genel', upvotes: 12, downvotes: 1, userVote: 'up' }, // Örnek: Buna like atmışız
+    { id: 2, user: '@ahmet_y', time: '10dk önce', text: 'Tavuk efsaneydi ama Kemalpaşa\'nın şerbeti çok azdı.', targetName: 'Genel', upvotes: 12, downvotes: 1, userVote: 'up' },
     { id: 1, user: '@mehmet_can', time: '35dk önce', text: 'Spordan sonra ilaç gibi geldi menü.', targetName: 'Genel', upvotes: 5, downvotes: 0, userVote: null },
   ]);
 
@@ -65,18 +74,17 @@ const Home = () => {
   };
 
   const handleRateMeal = (e, mealId, score) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Kartın dönmesini engelle
     setUserRatings(prev => ({ ...prev, [mealId]: score }));
     showToast(`+10 XP: ${score} Yıldız Verildi! ⭐`);
   };
 
   const addNewComment = (newCommentObj) => {
-    // Yeni eklenen yorumun vote durumu null başlar
     setComments(prevComments => [{ ...newCommentObj, upvotes:0, downvotes:0, userVote: null }, ...prevComments]);
     showToast('+15 XP: Yorum Yapıldı! ✍️');
   };
 
-  // --- OYLAMA MANTIĞI (DÜZELTİLDİ) ---
+  // --- OYLAMA MANTIĞI (TOGGLE) ---
   const handleVote = (commentId, type) => {
     setComments(prevComments => prevComments.map(c => {
         if (c.id !== commentId) return c;
@@ -86,24 +94,22 @@ const Home = () => {
         let newVote = c.userVote;
         let showXP = false;
 
-        // Senaryo 1: Zaten seçili olana tekrar bastı (Oyu geri çekme)
+        // Senaryo 1: Aynı oya tekrar basarsa (Geri alma)
         if (newVote === type) {
             if (type === 'up') newUp--;
             else newDown--;
-            newVote = null; // Oy silindi
+            newVote = null; 
         } 
-        // Senaryo 2: Farklı bir şeye bastı veya ilk defa basıyor
+        // Senaryo 2: Yeni oy veriyor veya değiştiriyor
         else {
-            // Eğer daha önce başka oyu varsa onu sil
-            if (newVote === 'up') newUp--;
-            if (newVote === 'down') newDown--;
+            if (newVote === 'up') newUp--;     // Eski up varsa sil
+            if (newVote === 'down') newDown--; // Eski down varsa sil
 
-            // Yeni oyu ekle
             if (type === 'up') newUp++;
             else newDown++;
             
             newVote = type;
-            showXP = true; // Sadece oy verirken veya değiştirirken XP ver
+            showXP = true; // Sadece yeni oyda XP göster
         }
 
         if (showXP) {
@@ -227,13 +233,13 @@ const Home = () => {
                 )}
                 <div style={{fontSize: '0.9rem', lineHeight: '1.4', color: 'white', marginBottom: '10px'}}>{c.text}</div>
                 
-                {/* --- GÜNCELLENEN OYLAMA BUTONLARI --- */}
+                {/* OYLAMA BUTONLARI */}
                 <div style={{display:'flex', gap:'20px', borderTop:'1px solid #333', paddingTop:'8px', fontSize:'0.9rem', color:'#888'}}>
-                    {/* LIKE BUTTON */}
+                    {/* LIKE */}
                     <div 
                         style={{
                             cursor:'pointer', display:'flex', alignItems:'center', gap:'5px',
-                            color: c.userVote === 'up' ? 'var(--primary)' : 'inherit', // Aktifse Turuncu
+                            color: c.userVote === 'up' ? 'var(--primary)' : 'inherit', 
                             fontWeight: c.userVote === 'up' ? '700' : '400'
                         }} 
                         onClick={() => handleVote(c.id, 'up')}
@@ -241,11 +247,11 @@ const Home = () => {
                         <i className={c.userVote === 'up' ? "fa-solid fa-thumbs-up" : "fa-regular fa-thumbs-up"}></i> {c.upvotes}
                     </div>
 
-                    {/* DISLIKE BUTTON */}
+                    {/* DISLIKE */}
                     <div 
                         style={{
                             cursor:'pointer', display:'flex', alignItems:'center', gap:'5px',
-                            color: c.userVote === 'down' ? '#FF453A' : 'inherit', // Aktifse Kırmızı
+                            color: c.userVote === 'down' ? '#FF453A' : 'inherit',
                             fontWeight: c.userVote === 'down' ? '700' : '400'
                         }} 
                         onClick={() => handleVote(c.id, 'down')}
@@ -264,11 +270,11 @@ const Home = () => {
         onAddComment={addNewComment} 
       />
 
-        {/* --- TOAST (XP BİLDİRİMİ - GÜNCELLENDİ) --- */}
+      {/* TOAST BİLDİRİMİ */}
       <div 
         style={{
             position: 'fixed',
-            bottom: toast.show ? '110px' : '-100px', /* Gösterilince yukarı kay */
+            bottom: toast.show ? '110px' : '-100px',
             left: '50%',
             transform: 'translateX(-50%)',
             background: '#333',
@@ -279,8 +285,8 @@ const Home = () => {
             alignItems: 'center',
             gap: '10px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-            zIndex: 9999, /* En üstte durmaya zorla */
-            transition: 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', /* Yaylanma efekti */
+            zIndex: 9999,
+            transition: 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             border: '1px solid #444',
             whiteSpace: 'nowrap'
         }}

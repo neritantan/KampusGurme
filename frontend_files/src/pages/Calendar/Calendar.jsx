@@ -1,30 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { getDailyMenu } from '../../services/menuService'; // DÜZELTME: Artık fonksiyonu çağırıyoruz
+import { useNavigate } from 'react-router-dom';
+import { getDailyMenu } from '../../services/menuService';
 
 const Calendar = () => {
-  const [openDay, setOpenDay] = useState(26); // Başlangıçta ayın 26'sı açık
-  const [dailyMenu, setDailyMenu] = useState(null); // O günün menüsünü tutacak state
-
+  const [openDay, setOpenDay] = useState(26);
+  const [dailyMenu, setDailyMenu] = useState(null);
+  
+  const navigate = useNavigate();
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const today = 26;
 
-  // Placeholder (Diğer günler için rastgele veri)
   const mains = [
       {name:"Kuru Fasulye", icon:"bowl-rice"}, 
       {name:"İzmir Köfte", icon:"drumstick-bite"}, 
       {name:"Et Sote", icon:"utensils"}
   ];
 
-  // Sayfa açılınca bugünün verisini çekelim
   useEffect(() => {
     const fetchData = async () => {
-        // Bugünün tarihine göre veri istiyoruz
         const todayDate = new Date(2025, 11, today); 
         const data = await getDailyMenu(todayDate);
         setDailyMenu(data);
     };
     fetchData();
   }, []);
+
+  // YENİ FONKSİYON: Butona tıklayınca çalışır
+  const handleGoToDay = (day) => {
+    const targetDate = new Date(2025, 11, day);
+    // Ana sayfaya yönlendir ve tarihi 'state' içinde gönder
+    navigate('/home', { state: { date: targetDate } });
+  };
 
   return (
     <section className="screen">
@@ -40,17 +46,20 @@ const Calendar = () => {
             const rndMain = mains[Math.floor(Math.random()*mains.length)];
             
             return (
-                <div key={day} className={`t-item ${isToday ? 'active' : ''} ${isOpen ? 'open' : ''}`} onClick={() => setOpenDay(isOpen ? null : day)}>
+                <div 
+                    key={day} 
+                    className={`t-item ${isToday ? 'active' : ''} ${isOpen ? 'open' : ''}`} 
+                    onClick={() => setOpenDay(isOpen ? null : day)}
+                    // onDoubleClick kaldırıldı, artık butona basacağız
+                >
                     <div className="t-dot"></div>
                     <div className="t-date">{day} Aralık</div>
                     
                     <div className="t-card">
                         <div className="t-card-header">
                             {isToday && dailyMenu ? (
-                                // Veri geldiyse gerçek resmi göster
                                 <div className="t-img-thumb" style={{backgroundImage:`url('${dailyMenu.meals[1].img}')`, display:'block', width:'40px', height:'40px', borderRadius:'8px', backgroundSize:'cover'}}></div>
                             ) : (
-                                // Veri yoksa veya bugün değilse ikon göster
                                 <div className="t-icon"><i className={`fa-solid fa-${rndMain.icon}`}></i></div>
                             )}
                             
@@ -59,7 +68,7 @@ const Calendar = () => {
                                     {isToday && dailyMenu ? dailyMenu.meals[1].name : rndMain.name}
                                 </div>
                                 <div className="t-subtitle" style={{color: isToday ? 'var(--primary)' : 'var(--text-muted)'}}>
-                                    {isToday ? 'Bugünün Menüsü' : 'Detaylar için dokun'}
+                                    {isToday ? 'Bugünün Menüsü' : 'Menüyü gör'}
                                 </div>
                             </div>
                             <div className="t-arrow"><i className="fa-solid fa-chevron-down"></i></div>
@@ -83,6 +92,29 @@ const Calendar = () => {
                                     </>
                                 )}
                             </div>
+
+                            {/* --- YENİ EKLENEN BUTON --- */}
+                            <div style={{padding: '10px 15px 15px 15px', borderTop: '1px solid #333', marginTop: '10px'}}>
+                                <button 
+                                    className="btn-primary" 
+                                    style={{
+                                        width: '100%', 
+                                        padding: '10px', 
+                                        fontSize: '0.9rem', 
+                                        display: 'flex', 
+                                        justifyContent: 'center', 
+                                        alignItems: 'center', 
+                                        gap: '8px'
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Kartın kapanmasını engelle
+                                        handleGoToDay(day);
+                                    }}
+                                >
+                                    Detaylar & Yorumlar <i className="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
