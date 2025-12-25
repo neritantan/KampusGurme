@@ -16,11 +16,33 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
 body { background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; height: 100vh; width: 100vw; }
-#app { width: 100%; height: 100%; position: relative; max-width: 440px; margin: 0 auto; background: var(--bg-dark); overflow: hidden; display: flex; flex-direction: column; }
+#app { 
+    width: 100%; 
+    height: 100vh; /* Ekranın tamamını kapla */
+    position: relative; 
+    max-width: 440px; 
+    margin: 0 auto; 
+    background: var(--bg-dark); 
+    overflow: hidden; /* Ana kapsayıcı taşmasın */
+    display: flex; 
+    flex-direction: column; 
+}
 
-/* Screen Management (React Router halledeceği için display:none mantığını sildik, yerine layout koyduk) */
-.screen { width: 100%; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 110px; }
-.screen::-webkit-scrollbar { display: none; }
+/* .screen sınıfını bununla DEĞİŞTİR */
+.screen { 
+    width: 100%; 
+    height: 100%; 
+    overflow-y: auto; /* Dikey kaydırmayı aç */
+    -webkit-overflow-scrolling: touch; /* Mobilde yumuşak kaydırma (iOS/Android) */
+    padding: 20px; 
+    padding-bottom: 120px; /* Alt menü (BottomNav) için boşluk bırak */
+    position: relative;
+}
+
+/* Kaydırma çubuğunu gizle (Daha şık görünüm için) */
+.screen::-webkit-scrollbar { 
+    display: none; 
+}
 
 /* --- GİRİŞ EKRANI STİLLERİ --- */
 .auth-container { display: flex; flex-direction: column; justify-content: center; height: 100%; }
@@ -145,3 +167,58 @@ body { background-color: var(--bg-dark); color: var(--text-main); overflow: hidd
 .nav-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(44, 44, 46, 0.95); backdrop-filter: blur(20px); padding: 15px 30px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); z-index: 100; border: 1px solid rgba(255, 255, 255, 0.1); transition: transform 0.3s; }
 .nav-icon { font-size: 1.4rem; color: var(--text-muted); cursor: pointer; transition: color 0.3s; }
 .nav-icon.active { color: var(--primary); }
+
+/* --- FLIP CARD EFEKTİ --- */
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 140px; /* Kart yüksekliği */
+  perspective: 1000px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  border-radius: var(--radius-lg);
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid #2C2C2E;
+  background-color: var(--bg-card);
+  overflow: hidden;
+}
+
+/* Ön yüz zaten tasarlanmıştı, arka yüz ayarları: */
+.flip-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(145deg, #1C1C1E, #151516);
+}
+
+.nut-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  width: 100%;
+  text-align: center;
+}

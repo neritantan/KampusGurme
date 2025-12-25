@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
-import { menuData } from '../../services/menuService'; // Gerçek veri için
+import React, { useState, useEffect } from 'react';
+import { getDailyMenu } from '../../services/menuService'; // DÜZELTME: Artık fonksiyonu çağırıyoruz
 
 const Calendar = () => {
   const [openDay, setOpenDay] = useState(26); // Başlangıçta ayın 26'sı açık
-  
+  const [dailyMenu, setDailyMenu] = useState(null); // O günün menüsünü tutacak state
+
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const today = 26;
 
-  // Placeholder veri
-  const mains = [{name:"Kuru Fasulye",icon:"bowl-rice"}, {name:"İzmir Köfte",icon:"drumstick-bite"}, {name:"Et Sote",icon:"utensils"}];
+  // Placeholder (Diğer günler için rastgele veri)
+  const mains = [
+      {name:"Kuru Fasulye", icon:"bowl-rice"}, 
+      {name:"İzmir Köfte", icon:"drumstick-bite"}, 
+      {name:"Et Sote", icon:"utensils"}
+  ];
+
+  // Sayfa açılınca bugünün verisini çekelim
+  useEffect(() => {
+    const fetchData = async () => {
+        // Bugünün tarihine göre veri istiyoruz
+        const todayDate = new Date(2025, 11, today); 
+        const data = await getDailyMenu(todayDate);
+        setDailyMenu(data);
+    };
+    fetchData();
+  }, []);
 
   return (
     <section className="screen">
@@ -30,14 +46,18 @@ const Calendar = () => {
                     
                     <div className="t-card">
                         <div className="t-card-header">
-                            {isToday ? (
-                                <div className="t-img-thumb" style={{backgroundImage:`url('${menuData.meals[1].image_url}')`, display:'block', width:'40px', height:'40px', borderRadius:'8px', backgroundSize:'cover'}}></div>
+                            {isToday && dailyMenu ? (
+                                // Veri geldiyse gerçek resmi göster
+                                <div className="t-img-thumb" style={{backgroundImage:`url('${dailyMenu.meals[1].img}')`, display:'block', width:'40px', height:'40px', borderRadius:'8px', backgroundSize:'cover'}}></div>
                             ) : (
+                                // Veri yoksa veya bugün değilse ikon göster
                                 <div className="t-icon"><i className={`fa-solid fa-${rndMain.icon}`}></i></div>
                             )}
                             
                             <div className="t-content" style={{paddingLeft:'10px'}}>
-                                <div className="t-main-dish">{isToday ? menuData.meals[1].name : rndMain.name}</div>
+                                <div className="t-main-dish">
+                                    {isToday && dailyMenu ? dailyMenu.meals[1].name : rndMain.name}
+                                </div>
                                 <div className="t-subtitle" style={{color: isToday ? 'var(--primary)' : 'var(--text-muted)'}}>
                                     {isToday ? 'Bugünün Menüsü' : 'Detaylar için dokun'}
                                 </div>
@@ -48,10 +68,10 @@ const Calendar = () => {
                         {/* Accordion Body */}
                         <div className="t-body" style={{ maxHeight: isOpen ? '500px' : '0' }}>
                             <div className="t-menu-list">
-                                {isToday ? (
-                                    menuData.meals.map((m, i) => (
+                                {isToday && dailyMenu ? (
+                                    dailyMenu.meals.map((m, i) => (
                                         <div className="t-menu-row" key={i}>
-                                            <div className="t-cat">{m.category.name}</div>
+                                            <div className="t-cat">{m.category}</div>
                                             <div className="t-food">{m.name}</div>
                                         </div>
                                     ))
