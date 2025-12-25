@@ -21,9 +21,23 @@ admin.site.register(DailyMenu, DailyMenuAdmin)
 
 # --- OTHER TABLES ---
 admin.site.register(User)
-admin.site.register(Meal)
-# admin.site.register(MealNutrition) # gives error due to version
-# admin.site.register(MealAllergen)  # gives error due to version
+
+# MealNutrition'i Meal icine gommek icin inline tanimi
+class MealNutritionInline(admin.StackedInline):
+    model = MealNutrition
+    can_delete = False
+    verbose_name_plural = 'Besin Değerleri'
+
+class MealAdmin(admin.ModelAdmin):
+    inlines = [MealNutritionInline] # Besin degerleri artik yemek sayfasinin icinde cikacak
+    list_display = ['name', 'category'] # Listede kategori de gorunsun
+    search_fields = ['name'] # Isimle arama yapabil
+    list_filter = ['category'] # Saga kategori filtresi koy
+
+admin.site.register(Meal, MealAdmin)
+
+# admin.site.register(MealNutrition) # gives error due to version -> Artik MealAdmin icinde, buraya gerek yok
+# admin.site.register(MealAllergen)  # gives error due to version -> Ileride bunu da inline yapabiliriz
 
 # --- USER INTERACTIONS ---
 admin.site.register(UserComment)
