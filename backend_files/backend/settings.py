@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'tr-tr'
+LANGUAGE_CODE = 'en-US'
 
 TIME_ZONE = 'Europe/Istanbul'
 
@@ -134,3 +134,5 @@ CLOUDINARY_STORAGE = {
 
 # For media files
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#-------------------------------------
+AUTH_USER_MODEL = 'core.User' #Overriding default user
