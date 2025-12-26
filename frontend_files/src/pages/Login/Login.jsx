@@ -30,7 +30,7 @@ const Login = () => {
         <div id="authForm">
           {isRegister && (
              <div className="input-group" style={{animation: 'slideIn 0.3s'}}>
-                <input type="text" className="custom-input" placeholder="Ad Soyad" />
+                <input type="text" className="custom-input" placeholder="Kullanıcı Adı" />
              </div>
           )}
           <div className="input-group">
