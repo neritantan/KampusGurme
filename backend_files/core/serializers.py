@@ -31,3 +31,35 @@ class DailyMenuSerializer(serializers.ModelSerializer):
         return MealSerializer(meals, many=True).data # all in one
 
 # work in progress for user interactions and other things
+
+# User registration serializers and stuff
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+
+User = get_user_model()
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    #Serializer for user registration takes JSON data and creates a new user instance
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password_confirm = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(required=True) 
+    
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'password_confirm', 'email']
+
+    def validate(self, attrs): # for password confirmation
+        if attrs['password'] != attrs['password_confirm']:
+            raise serializers.ValidationError({"password": "Sifreler uyusmuyor!"})
+        return attrs
+
+    def create(self, validated_data): # for creating user
+        validated_data.pop('password_confirm')
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data['email']
+        )
+        return user
+        
