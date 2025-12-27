@@ -113,7 +113,9 @@ class CheckAuthView(APIView):
         return Response({
             'isAuthenticated': True,
             'username': request.user.username,
-            'email': request.user.email
+            'email': request.user.email,
+            'total_xp': request.user.total_xp,
+            'rank': request.user.rank.rank_name if request.user.rank else "Peçete" # to show in profile
         })
 
 ###########################################
