@@ -63,3 +63,25 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
         
+################################ Social Serializers ################################
+
+class UserCommentSerializer(serializers.ModelSerializer):
+
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+
+        model = UserComment
+        
+        fields = ['comment_id', 'username', 'menu', 'subject_meal', 'comment_text', 'upvotes', 'downvotes', 'created_at']
+        read_only_fields = ['comment_id', 'username', 'upvotes', 'downvotes', 'created_at']
+        
+    
+        extra_kwargs = {
+            'subject_meal': {'required': False, 'allow_null': True}
+        }
+
+class ItemRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemRating
+        fields = ['rating_id', 'menu', 'meal', 'rating']

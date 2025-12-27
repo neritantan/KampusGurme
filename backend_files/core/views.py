@@ -148,3 +148,66 @@ class CheckAuthView(APIView):
         })
 
 ###########################################
+# Social Views
+
+class CommentView(APIView):
+    
+    def get_permissions(self): # everybody can get comments, but only authenticated users can post comments
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get(self, request, menu_id): # get comments for a specific menu
+
+        comments = UserComment.objects.filter(menu_id=menu_id).order_by('-upvotes', '-created_at')
+        serializer = UserCommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, menu_id): # post a comment
+
+        data = request.data.copy()
+        data['menu'] = menu_id
+        
+        serializer = UserCommentSerializer(data=data)
+        if serializer.is_valid():
+
+            serializer.save(user=request.user)
+            
+            # Anti-Spam only gives XP for first 3 comments
+            files_count = UserComment.objects.filter(user=request.user, menu_id=menu_id).count()
+            if files_count <= 3:
+                request.user.add_xp('WRITE_COMMENT')
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#rating
+class RatingView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, menu_id):
+        data = request.data.copy()
+        data['menu'] = menu_id
+        meal_id = data.get('meal')
+        
+        # check if exists
+        existing_rating = ItemRating.objects.filter(user=request.user, menu_id=menu_id, meal_id=meal_id).first()
+
+        if existing_rating:
+            # update if exists
+            serializer = ItemRatingSerializer(existing_rating, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            # create if doesn't exist
+            serializer = ItemRatingSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+
+                request.user.add_xp('MEAL_RATING') # add xp for rating
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
