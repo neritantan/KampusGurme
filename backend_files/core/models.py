@@ -51,7 +51,36 @@ class User(AbstractUser):
         role_name = "Admin" if self.is_staff else "Student"
         return f"{self.username} ({role_name})"
 
+    def add_xp(self, action_name): # adding xp to user for actions
+        from django.apps import apps
+        ActionConfig = apps.get_model('core', 'ActionConfig')
+        Rank = apps.get_model('core', 'Rank')
+        ActionLog = apps.get_model('core', 'ActionLog')
+        
+        try:
+            config = ActionConfig.objects.get(action_name=action_name)
+        except ActionConfig.DoesNotExist:
+            return
 
+        self.total_xp += config.xp_value
+        self.save()
+
+        ActionLog.objects.create(
+            user=self,
+            action=config,
+            xp_gained=config.xp_value
+        )
+
+        possible_ranks = Rank.objects.order_by('-min_xp')
+        for r in possible_ranks:
+            if self.total_xp >= r.min_xp:
+                if self.rank != r:
+                    self.rank = r
+                    self.save()
+                break
+
+
+#-------------------------------------------------
 class ActionLog(models.Model):
     log_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
