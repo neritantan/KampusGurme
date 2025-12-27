@@ -11,8 +11,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .models import DailyMenu
-from .serializers import DailyMenuSerializer, UserRegistrationSerializer
+from .models import DailyMenu, UserComment, ItemRating, CommentVote
+from django.db.models import F                                      # For preventing race conditions    
+from .serializers import DailyMenuSerializer, UserRegistrationSerializer, UserCommentSerializer, ItemRatingSerializer
 ###################################################
 
 class TodayMenuView(APIView):
@@ -211,3 +212,71 @@ class RatingView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Upvote/Downvote logic
+class VoteCommentView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, comment_id):
+        # Default to UP if not provided
+        vote_type = request.data.get('vote_type', 'UP') 
+        if vote_type not in ['UP', 'DOWN']:
+            return Response({"error": "Invalid vote type. Use UP or DOWN"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            comment = UserComment.objects.get(comment_id=comment_id)
+        except UserComment.DoesNotExist:
+             return Response({"error": "Yorum bulunamadi"}, status=status.HTTP_404_NOT_FOUND)
+
+        existing_vote = CommentVote.objects.filter(user=request.user, comment=comment).first()
+
+        if existing_vote:
+            if existing_vote.vote_type == vote_type:
+
+                existing_vote.delete()
+                
+
+                if vote_type == 'UP':
+                    comment.upvotes = F('upvotes') - 1
+                else:
+                    comment.downvotes = F('downvotes') - 1
+                
+                comment.save()
+
+                comment.refresh_from_db()
+                return Response({"status": "removed", "upvotes": comment.upvotes, "downvotes": comment.downvotes}, status=status.HTTP_200_OK)
+            
+            else:
+                old_type = existing_vote.vote_type
+                existing_vote.vote_type = vote_type
+                existing_vote.save()
+                
+                if vote_type == 'UP':
+                    comment.upvotes = F('upvotes') + 1
+                    comment.downvotes = F('downvotes') - 1
+                    # Give XP to comment owner for receiving UP (Check: Don't give XP to self)
+                    if comment.user and comment.user != request.user: 
+                        comment.user.add_xp('RECEIVE_UPVOTE')
+                else:
+                    comment.upvotes = F('upvotes') - 1
+                    comment.downvotes = F('downvotes') + 1
+                
+                comment.save()
+                comment.refresh_from_db()
+                return Response({"status": "switched", "upvotes": comment.upvotes, "downvotes": comment.downvotes}, status=status.HTTP_200_OK)
+
+        else:
+            CommentVote.objects.create(user=request.user, comment=comment, vote_type=vote_type)
+            
+            if vote_type == 'UP':
+                comment.upvotes = F('upvotes') + 1
+                # Give XP to comment owner (Check: Don't give XP to self)
+                if comment.user and comment.user != request.user:
+                    comment.user.add_xp('RECEIVE_UPVOTE')
+            else:
+                comment.downvotes = F('downvotes') + 1
+            
+            comment.save()
+            comment.refresh_from_db()
+            return Response({"status": "created", "upvotes": comment.upvotes, "downvotes": comment.downvotes}, status=status.HTTP_201_CREATED)

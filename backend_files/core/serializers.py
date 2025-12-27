@@ -81,7 +81,11 @@ class UserCommentSerializer(serializers.ModelSerializer):
             'subject_meal': {'required': False, 'allow_null': True}
         }
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 class ItemRatingSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    
     class Meta:
         model = ItemRating
         fields = ['rating_id', 'menu', 'meal', 'rating']

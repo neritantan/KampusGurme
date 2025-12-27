@@ -205,6 +205,19 @@ class UserComment(models.Model):
         verbose_name_plural = 'User Comments'
 
 
+class CommentVote(models.Model):
+    vote_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.CASCADE) # automatically takes PK of User table as FK
+    comment = models.ForeignKey(UserComment, models.CASCADE, related_name='votes')
+    vote_type = models.CharField(max_length=10, choices=[('UP', 'Upvote'), ('DOWN', 'Downvote')], default='UP')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'COMMENT_VOTE'
+        unique_together = ('user', 'comment') 
+        verbose_name = 'Comment Vote'
+        verbose_name_plural = 'Comment Votes'
+
 # Other Many-to-Many Link Tables (hidden from admin panel)
 class MealAllergen(models.Model):
     pk = models.CompositePrimaryKey('meal_id', 'allergen_id')
