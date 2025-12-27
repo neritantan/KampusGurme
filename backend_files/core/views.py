@@ -1,30 +1,53 @@
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout # Giris/Cikis icin
+from datetime import datetime
+
+from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import ensure_csrf_cookie # CSRF cerezi icin
+from django.views.decorators.csrf import ensure_csrf_cookie 
 from django.utils.decorators import method_decorator
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated # Yetki kontrolu
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import DailyMenu
-from .serializers import DailyMenuSerializer, UserRegistrationSerializer # User Serializer'i da ekledik
+from .serializers import DailyMenuSerializer, UserRegistrationSerializer
 ###################################################
 
 class TodayMenuView(APIView):
-    def get(self, request):                     # GET
+
+    permission_classes = (AllowAny, )# you can check the menu without being logged in
+
+    def get(self, request):
         today = timezone.now().date()
+        return self.get_menu_response(today)
+
+    def get_menu_response(self, date_obj): # new function for getting menu DRY
         try:
-            menu = DailyMenu.objects.get(menu_date=today)# get today's menu
-            serializer = DailyMenuSerializer(menu) # turn it to JSON
+            menu = DailyMenu.objects.get(menu_date=date_obj)
+            serializer = DailyMenuSerializer(menu)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except DailyMenu.DoesNotExist:
             return Response(
-                {"error": "Bugün yemek çıkmadı aga, aç kaldık."},
+                {"error": f"{date_obj} tarihinde yemek çıkmadı aga, aç kaldık."},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+class MenuByDateView(TodayMenuView):
+    
+    permission_classes = (AllowAny, )
+
+    def get(self, request, date_str): # translates the date string to date object/ YYYY-MM-DD format
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+            return self.get_menu_response(date_obj) # calls the get_menu_response function for the specific date
+        except ValueError:
+            return Response(
+                {"error": "Geçersiz tarih formatı"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 
 
@@ -40,7 +63,6 @@ class GetCSRFToken(APIView):
         return Response({'success': 'CSRF cookie set'})
 
 #register
-# 2. Kayit Olma (Register)
 class RegisterView(APIView):
     # register user using UserRegistrationSerializer
     permission_classes = (AllowAny, )

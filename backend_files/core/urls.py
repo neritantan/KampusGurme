@@ -1,10 +1,11 @@
 from django.urls import path
 
-from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken 
+from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken, MenuByDateView
 
 urlpatterns = [
-    #Get Today's Menu
-    path('today/', TodayMenuView.as_view(), name='today-menu'),
+    #Get Menus
+    path('menu/today/', TodayMenuView.as_view(), name='today-menu'),
+    path('menu/<str:date_str>/', MenuByDateView.as_view(), name='menu-by-date'),
 
     # Auth Endpoints
     path('auth/register/', RegisterView.as_view(), name='register'),
