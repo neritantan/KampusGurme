@@ -118,6 +118,7 @@ const Home = () => {
 
   const handleRateMeal = (e, mealId, score) => {
     e.stopPropagation();
+    if (!user) { showToast('⚠️ Puanlamak için giriş yapın!'); return; }
     setUserRatings(prev => ({ ...prev, [mealId]: score }));
     showToast(`+10 XP: ${score} Yıldız Verildi! ⭐`);
   };
@@ -128,6 +129,7 @@ const Home = () => {
   };
 
   const handleVote = (commentId, type) => {
+    if (!user) { showToast('⚠️ Oylamak için giriş yapın!'); return; }
     setComments(prevComments => prevComments.map(c => {
       if (c.id !== commentId) return c;
       let newUp = c.upvotes;
@@ -169,7 +171,7 @@ const Home = () => {
           </div>
         ) : (
           // Giriş Yapılmamışsa: Giriş Butonu
-          <div onClick={() => navigate('/')} style={{ background: '#333', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
+          <div onClick={() => navigate('/login')} style={{ background: '#333', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
             Giriş Yap <i className="fa-solid fa-arrow-right-to-bracket" style={{ marginLeft: '5px' }}></i>
           </div>
         )}
@@ -274,7 +276,10 @@ const Home = () => {
       <div style={{ marginTop: '25px', marginBottom: '50px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
           <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>Öğrenci Yorumları</div>
-          <div style={{ color: 'var(--primary)', fontSize: '0.9rem', cursor: 'pointer', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => setIsCommentsOpen(true)}>
+          <div style={{ color: 'var(--primary)', fontSize: '0.9rem', cursor: 'pointer', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => {
+            if (!user) { showToast('⚠️ Yorum yapmak için giriş yapın!'); return; }
+            setIsCommentsOpen(true)
+          }}>
             Yorum Yap <i className="fa-solid fa-pen"></i>
           </div>
         </div>

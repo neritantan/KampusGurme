@@ -8,12 +8,13 @@ import BottomNav from './components/layout/BottomNav';
 
 const App = () => {
   const location = useLocation();
-  const showNav = location.pathname !== '/'; 
+  const showNav = location.pathname !== '/login';
 
   return (
     <div id="app">
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/stats" element={<Leaderboard />} />

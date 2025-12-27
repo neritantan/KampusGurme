@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkAuth, logout } from '../../services/authService';
+import GuestWarning from '../../components/layout/GuestWarning';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -10,17 +11,19 @@ const Profile = () => {
         total_xp: 0
     });
 
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
+
     useEffect(() => {
         const fetchData = async () => {
             const authData = await checkAuth();
             if (!authData.isAuthenticated) {
-                navigate('/'); // Giriş yapmamışsa at
+                setIsAuthenticated(false);
             } else {
                 setUser(authData);
             }
         };
         fetchData();
-    }, [navigate]);
+    }, []);
 
     // Kullanıcının Yorumları (MOCK - Backend henüz desteklemiyor)
     const [myComments, setMyComments] = useState([
@@ -61,6 +64,10 @@ const Profile = () => {
         await logout();
         navigate('/');
     };
+
+    if (!isAuthenticated) {
+        return <section className="screen"><GuestWarning message="Profilinizi görmek ve düzenlemek için giriş yapmalısınız." /></section>;
+    }
 
     return (
         <section className="screen">
