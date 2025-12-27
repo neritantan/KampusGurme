@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getDailyMenu } from '../../services/menuService';
-import { getCsrfToken } from '../../services/authService';
+import { getCsrfToken, checkAuth, logout } from '../../services/authService';
 import CommentsModal from '../../components/modals/CommentsModal';
 
 const Home = () => {
@@ -14,6 +14,8 @@ const Home = () => {
     }
     return new Date(2025, 11, 26);
   });
+
+  const [user, setUser] = useState(null); // Kullanıcı Bilgisi (XP, Rank, Username)
 
   const [menu, setMenu] = useState(null);
   const [nutrition, setNutrition] = useState({ kcal: 0, prot: 0, carb: 0, fat: 0 });
@@ -30,7 +32,15 @@ const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await getCsrfToken(); // CSRF Token alimi
+      // 1. Auth Kontrolü
+      const authData = await checkAuth();
+      if (authData.isAuthenticated) {
+        setUser(authData);
+      }
+
+      // 2. CSRF (Eğer login değilsek bile tazeleyelim)
+      await getCsrfToken();
+
       setMenu(null);
       const data = await getDailyMenu(currentDate);
       setMenu(data);
@@ -142,9 +152,27 @@ const Home = () => {
     <section className="screen">
       <header className="header">
         <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Kampüs<span>Gurme</span></div>
-        <div onClick={() => navigate('/')} style={{ background: '#333', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
-          Giriş Yap <i className="fa-solid fa-arrow-right-to-bracket" style={{ marginLeft: '5px' }}></i>
-        </div>
+
+        {user ? (
+          // Giriş Yapılmışsa: Profil Kartı
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--primary)' }}>{user.rank || 'Acemi Gurme'}</div>
+              <div style={{ fontSize: '0.7rem', color: '#888' }}>{user.total_xp || 0} XP</div>
+            </div>
+            <div
+              onClick={async () => { await logout(); setUser(null); navigate('/'); }}
+              style={{ background: '#2C2C2E', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid #444' }}
+            >
+              <i className="fa-solid fa-right-from-bracket" style={{ color: '#FF453A', fontSize: '0.9rem' }}></i>
+            </div>
+          </div>
+        ) : (
+          // Giriş Yapılmamışsa: Giriş Butonu
+          <div onClick={() => navigate('/')} style={{ background: '#333', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
+            Giriş Yap <i className="fa-solid fa-arrow-right-to-bracket" style={{ marginLeft: '5px' }}></i>
+          </div>
+        )}
       </header>
 
       <div className="date-nav">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDailyMenu } from '../../services/menuService';
+import { getDailyMenu, getMonthlyMenu } from '../../services/menuService';
 
 const Calendar = () => {
     const [openDay, setOpenDay] = useState(26);
@@ -16,11 +16,18 @@ const Calendar = () => {
         { name: "Et Sote", icon: "utensils" }
     ];
 
+    const [monthlyData, setMonthlyData] = useState({});
+
     useEffect(() => {
         const fetchData = async () => {
+            // 1. Bugünün detaylı menüsü
             const todayDate = new Date(2025, 11, today);
-            const data = await getDailyMenu(todayDate);
-            setDailyMenu(data);
+            const dailyData = await getDailyMenu(todayDate);
+            setDailyMenu(dailyData);
+
+            // 2. Aylık Takvim Verisi (Ana Yemekler)
+            const monthData = await getMonthlyMenu();
+            setMonthlyData(monthData);
         };
         fetchData();
     }, []);
@@ -58,64 +65,78 @@ const Calendar = () => {
                             <div className="t-card">
                                 <div className="t-card-header">
                                     {isToday && dailyMenu ? (
-                                        <div className="t-img-thumb" style={{ backgroundImage: `url('${dailyMenu.meals[1].img}')`, display: 'block', width: '40px', height: '40px', borderRadius: '8px', backgroundSize: 'cover' }}></div>
+                                        (dailyMenu.meals[1] && dailyMenu.meals[1].img) ? (
+                                            <div className="t-img-thumb" style={{ backgroundImage: `url('${dailyMenu.meals[1].img}')`, display: 'block', width: '60px', height: '60px', borderRadius: '16px', backgroundSize: 'cover' }}></div>
+                                        ) : (
+                                            <div className="t-icon" style={{ background: 'rgba(255, 102, 0, 0.2)', color: 'var(--primary)' }}><i className="fa-solid fa-utensils"></i></div>
+                                        )
                                     ) : (
-                                        <div className="t-icon"><i className={`fa-solid fa-${rndMain.icon}`}></i></div>
+                                        monthlyData[day] ? (
+                                            monthlyData[day].image ?
+                                                <div className="t-img-thumb" style={{ backgroundImage: `url('${monthlyData[day].image}')`, display: 'block', width: '60px', height: '60px', borderRadius: '16px', backgroundSize: 'cover' }}></div>
+                                                : <div className="t-icon" style={{ background: 'rgba(255, 59, 48, 0.15)', color: '#FF3B30' }}><i className={`fa-solid fa-utensils`}></i></div>
+                                        ) : (
+                                            <div className="t-icon" style={{ background: '#333', color: '#555' }}><i className={`fa-solid fa-circle-question`}></i></div>
+                                        )
                                     )}
 
-                                    <div className="t-content" style={{ paddingLeft: '10px' }}>
+                                    <div className="t-content" style={{ paddingLeft: '5px' }}>
                                         <div className="t-main-dish">
-                                            {isToday && dailyMenu ? dailyMenu.meals[1].name : rndMain.name}
+                                            {isToday && dailyMenu ? dailyMenu.meals[1].name : (monthlyData[day] ? monthlyData[day].name : 'Menü Girilmedi')}
                                         </div>
                                         <div className="t-subtitle" style={{ color: isToday ? 'var(--primary)' : 'var(--text-muted)' }}>
-                                            {isToday ? 'Bugünün Menüsü' : 'Menüyü gör'}
+                                            {isToday ? 'Bugünün Menüsü' : (monthlyData[day] ? 'Ana Yemek' : '-')}
                                         </div>
                                     </div>
+
                                     <div className="t-arrow"><i className="fa-solid fa-chevron-down"></i></div>
                                 </div>
+                            </div>
 
-                                {/* Accordion Body */}
-                                <div className="t-body" style={{ maxHeight: isOpen ? '500px' : '0' }}>
-                                    <div className="t-menu-list">
-                                        {isToday && dailyMenu ? (
-                                            dailyMenu.meals.map((m, i) => (
-                                                <div className="t-menu-row" key={i}>
-                                                    <div className="t-cat">{m.category}</div>
-                                                    <div className="t-food">{m.name}</div>
-                                                </div>
-                                            ))
-                                        ) : (
+                            {/* Accordion Body */}
+                            <div className="t-body" style={{ maxHeight: isOpen ? '500px' : '0' }}>
+                                <div className="t-menu-list">
+                                    {isToday && dailyMenu ? (
+                                        dailyMenu.meals.map((m, i) => (
+                                            <div className="t-menu-row" key={i} style={{ paddingBottom: '8px', borderBottom: i < dailyMenu.meals.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                                                <div className="t-cat" style={{ color: 'var(--primary)' }}>{m.category}</div>
+                                                <div className="t-food" style={{ fontWeight: '600' }}>{m.name}</div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        monthlyData[day] ? (
                                             <>
-                                                <div className="t-menu-row"><div className="t-cat">Çorba</div><div className="t-food">Ezogelin Çorbası</div></div>
-                                                <div className="t-menu-row"><div className="t-cat">Ana Yemek</div><div className="t-food">{rndMain.name}</div></div>
-                                                <div className="t-menu-row"><div className="t-cat">Yardımcı</div><div className="t-food">Pirinç Pilavı</div></div>
+                                                <div className="t-menu-row"><div className="t-cat">Ana Yemek</div><div className="t-food">{monthlyData[day].name}</div></div>
+                                                <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px', fontStyle: 'italic' }}>Diğer yemekler için detaya git</div>
                                             </>
-                                        )}
-                                    </div>
-
-                                    {/* --- YENİ EKLENEN BUTON --- */}
-                                    <div style={{ padding: '10px 15px 15px 15px', borderTop: '1px solid #333', marginTop: '10px' }}>
-                                        <button
-                                            className="btn-primary"
-                                            style={{
-                                                width: '100%',
-                                                padding: '10px',
-                                                fontSize: '0.9rem',
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                gap: '8px'
-                                            }}
-                                            onClick={(e) => {
-                                                e.stopPropagation(); // Kartın kapanmasını engelle
-                                                handleGoToDay(day);
-                                            }}
-                                        >
-                                            Detaylar & Yorumlar <i className="fa-solid fa-arrow-right"></i>
-                                        </button>
-                                    </div>
-
+                                        ) : (
+                                            <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>Bu tarih için menü bulunamadı.</div>
+                                        )
+                                    )}
                                 </div>
+
+                                {/* --- YENİ EKLENEN BUTON --- */}
+                                <div style={{ padding: '10px 15px 15px 15px', borderTop: '1px solid #333', marginTop: '10px' }}>
+                                    <button
+                                        className="btn-primary"
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            fontSize: '0.9rem',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Kartın kapanmasını engelle
+                                            handleGoToDay(day);
+                                        }}
+                                    >
+                                        Detaylar & Yorumlar <i className="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
                     );

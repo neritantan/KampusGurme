@@ -40,4 +40,25 @@ export const getDailyMenu = async (dateObj) => {
     console.error("Menü hatası:", error);
     return null;
   }
+  return null;
+}
+
+
+export const getMonthlyMenu = async () => {
+  try {
+    const response = await api.get('menu/calendar/');
+    // Backend returns: [{ date: "2025-12-26", main_dish: { ... } }, ...]
+    // We might want to map it to a dictionary for easier lookup: { "26": { ... } }
+    const data = response.data;
+    const menuMap = {};
+    data.forEach(item => {
+      const d = new Date(item.date);
+      const day = d.getDate();
+      menuMap[day] = item.main_dish;
+    });
+    return menuMap;
+  } catch (error) {
+    console.error("Takvim verisi alınamadı:", error);
+    return {};
+  }
 };
