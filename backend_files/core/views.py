@@ -58,6 +58,7 @@ class MenuByDateView(TodayMenuView):
 #CSRF Token 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class GetCSRFToken(APIView):
+    permission_classes = (AllowAny, )
     # Ensure CSRF cookie is set when user visits the page # FRONTEND should implement this
     def get(self, request):
         return Response({'success': 'CSRF cookie set'})
