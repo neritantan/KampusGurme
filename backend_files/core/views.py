@@ -48,8 +48,37 @@ class MenuByDateView(TodayMenuView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+class MonthlyMenuMainDishesView(APIView): # for calender view
+    permission_classes = (AllowAny, )
 
+    def get(self, request):
+        today = datetime.now().date()
+        year = today.year
+        month = today.month
+        
+        menus = DailyMenu.objects.filter(menu_date__year=year, menu_date__month=month).order_by('menu_date')
+        
+        data = []
 
+        for menu in menus:
+            from .models import MenuContent
+
+            main_dish_content = MenuContent.objects.filter(
+                menu=menu,
+                meal__category__name="main" 
+            ).select_related('meal').first()
+
+            if main_dish_content:
+                data.append({
+                    "date": menu.menu_date,
+                    "main_dish": {
+                        "id": main_dish_content.meal.meal_id,
+                        "name": main_dish_content.meal.name,
+                        "image": main_dish_content.meal.image_url
+                    }
+                })
+        
+        return Response(data)
 
 ###################################################
 
