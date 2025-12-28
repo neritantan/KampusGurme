@@ -4,7 +4,7 @@ import {
     PieChart, Pie, Cell, Legend
 } from 'recharts';
 import {
-    TrendingUp, Users, Star, AlertTriangle, ArrowUp, ArrowDown, PieChart as PieIcon, Calendar, Sparkles, ArrowRight, ChefHat
+    TrendingUp, Users, Star, AlertTriangle, ArrowUp, ArrowDown, PieChart as PieIcon, Calendar, Sparkles, ArrowRight, ChefHat, Lock
 } from 'lucide-react';
 
 import { getDashboardStats, getDashboardAnalytics } from '../../services/dashboardService';
@@ -477,7 +477,7 @@ const AIAgentCard = () => {
                     cursor: 'pointer',
                     boxShadow: '0 4px 15px rgba(255,255,255,0.2)'
                 }}>
-                    <ArrowUp size={24} color="#1C1C1E" strokeWidth={3} />
+                    <Lock size={20} color="#1C1C1E" strokeWidth={3} />
                 </div>
             </div>
         </div>
