@@ -141,11 +141,19 @@ class CheckAuthView(APIView):
     permission_classes = (IsAuthenticated, )
     
     def get(self, request):
+        from .models import Rank
+        
+        # Calculate next rank xp
+        current_xp = request.user.total_xp
+        next_rank = Rank.objects.filter(min_xp__gt=current_xp).order_by('min_xp').first()
+        next_rank_xp = next_rank.min_xp if next_rank else None
+
         return Response({
             'isAuthenticated': True,
             'username': request.user.username,
             'email': request.user.email,
             'total_xp': request.user.total_xp,
+            'next_rank_xp': next_rank_xp,
             'rank': request.user.rank.rank_name if request.user.rank else "Peçete" # to show in profile
         })
 
