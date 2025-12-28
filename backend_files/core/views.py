@@ -395,14 +395,23 @@ class DashboardStatsView(APIView):
         from django.utils import timezone
         import datetime
 
-        today = timezone.now().date()
+        # Get date from query params or default to today
+        date_str = request.query_params.get('date')
+        if date_str:
+            try:
+                today = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+            except ValueError:
+                today = timezone.now().date()
+        else:
+            today = timezone.now().date()
+            
         yesterday = today - datetime.timedelta(days=1)
 
-        # 1. Total Votes (Today)
+        # 1. Total Votes (Selected Date)
         today_ratings_qs = ItemRating.objects.filter(created_at__date=today)
         total_votes = today_ratings_qs.count()
 
-        # 2. Average Score (Today)
+        # 2. Average Score (Selected Date)
         today_avg = today_ratings_qs.aggregate(Avg('rating'))['rating__avg'] or 0
         today_avg = round(today_avg, 2)
 
@@ -418,13 +427,18 @@ class DashboardStatsView(APIView):
         
         diff_percent = round(diff_percent, 1)
 
-        # 4. Lowest Rated Meal (Today)
-        # Find the meal with lowest avg rating in today's menu
+        # 4. Satisfaction Rate (Selected Date)
+        # 3+ is Positive, <3 is Negative
+        positive_votes = today_ratings_qs.filter(rating__gte=3).count()
+        satisfaction_rate = 0
+        if total_votes > 0:
+            satisfaction_rate = round((positive_votes / total_votes) * 100)
+
+        # 5. Lowest Rated Meal (Selected Date)
         worst_meal_data = None
         try:
             todays_menu = DailyMenu.objects.filter(menu_date=today).first()
             if todays_menu:
-                # Find worst meal in this menu
                 worst_meal = ItemRating.objects.filter(menu=todays_menu)\
                     .values('meal__name', 'meal__image_url')\
                     .annotate(avg=Avg('rating'))\
@@ -444,7 +458,9 @@ class DashboardStatsView(APIView):
             "today_avg": today_avg,
             "yesterday_avg": round(yesterday_avg, 2),
             "diff_percent": diff_percent,
-            "worst_meal": worst_meal_data
+            "satisfaction_rate": satisfaction_rate,
+            "worst_meal": worst_meal_data,
+            "selected_date": today
         }, status=status.HTTP_200_OK)
 
 class DashboardAnalyticsView(APIView):
@@ -457,16 +473,32 @@ class DashboardAnalyticsView(APIView):
         import datetime
 
         today = timezone.now().date()
-        thirty_days_ago = today - datetime.timedelta(days=30)
         
-        # 1. Trend Chart (Last 30 Days)
-        # Group by Date, Calculate Avg Rating
-        trend_data = ItemRating.objects.filter(created_at__date__gte=thirty_days_ago)\
+        # Get Month/Year Query Params
+        try:
+            year = int(request.query_params.get('year', today.year))
+            month = int(request.query_params.get('month', today.month))
+        except ValueError:
+            year = today.year
+            month = today.month
+
+        # Calculate Start/End of Month
+        start_date = datetime.date(year, month, 1)
+        if month == 12:
+            end_date = datetime.date(year + 1, 1, 1)
+        else:
+            end_date = datetime.date(year, month + 1, 1)
+        
+        # 1. Trend Chart (Selected Month)
+        trend_data = ItemRating.objects.filter(
+                created_at__date__gte=start_date,
+                created_at__date__lt=end_date
+            )\
             .values('created_at__date')\
             .annotate(avg_score=Avg('rating'), count=Count('rating_id'))\
             .order_by('created_at__date')
         
-        # Format for frontend [ {date: '2024-10-01', score: 4.2}, ... ]
+        # Format for frontend
         chart_data = []
         for entry in trend_data:
             chart_data.append({
@@ -475,9 +507,11 @@ class DashboardAnalyticsView(APIView):
                 "votes": entry['count']
             })
 
-        # 2. Sentiment Distribution (This Month)
-        this_month_start = today.replace(day=1)
-        month_ratings = ItemRating.objects.filter(created_at__date__gte=this_month_start)
+        # 2. Sentiment Distribution (Selected Month)
+        month_ratings = ItemRating.objects.filter(
+            created_at__date__gte=start_date,
+            created_at__date__lt=end_date
+        )
         
         positive = month_ratings.filter(rating__gte=3).count()
         negative = month_ratings.filter(rating__lt=3).count()
@@ -486,8 +520,16 @@ class DashboardAnalyticsView(APIView):
             {"name": "Pozitif (3+)", "value": positive},
             {"name": "Negatif (<3)", "value": negative}
         ]
+        
+        # Calculate satisfaction for the month (for analytics display)
+        monthly_satisfaction = 0
+        total_month = positive + negative
+        if total_month > 0:
+            monthly_satisfaction = round((positive / total_month) * 100)
 
         return Response({
             "trend_chart": chart_data,
-            "sentiment_chart": sentiment_data
+            "sentiment_chart": sentiment_data,
+            "monthly_satisfaction": monthly_satisfaction,
+            "selected_period": f"{year}-{month}"
         }, status=status.HTTP_200_OK)

@@ -15,3 +15,6 @@ db.sqlite3
 # OS Trash
 .DS_Store
 Thumbs.db
+
+# Scripts
+backend_files/scripts/
