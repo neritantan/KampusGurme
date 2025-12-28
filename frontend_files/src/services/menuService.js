@@ -8,11 +8,11 @@ const formatDate = (dateObj) => {
   return `${year}-${month}-${day}`;
 };
 
-export const getDailyMenu = async (dateObj) => {
+export const getDailyMenu = async (dateObj, options = {}) => {
   try {
     const dateStr = formatDate(dateObj);
     // Yeni Backend Endpoint: /menu/YYYY-MM-DD/
-    const response = await api.get(`menu/${dateStr}/`);
+    const response = await api.get(`menu/${dateStr}/`, options);
     const data = response.data;
 
     if (!data || !data.meals) return null;

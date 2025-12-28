@@ -28,6 +28,8 @@ const Home = () => {
 
   // 1. Auth & Menu Fetch
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchMenuAndAuth = async () => {
       // Auth Check
       const authData = await checkAuth();
@@ -37,45 +39,57 @@ const Home = () => {
       await getCsrfToken();
 
       // Menu Fetch
+      // Menu Fetch
       setMenu(null);
-      const data = await getDailyMenu(currentDate);
+      try {
+        const data = await getDailyMenu(currentDate, { signal: abortController.signal });
 
-      if (data) {
-        setMenu(data);
+        if (data) {
+          setMenu(data);
 
-        // Calculate Totals
-        if (data.meals) {
-          const totals = data.meals.reduce((acc, meal) => {
-            acc.kcal += meal.kcal;
-            acc.prot += meal.prot;
-            acc.carb += meal.carb;
-            acc.fat += meal.fat;
-            return acc;
-          }, { kcal: 0, prot: 0, carb: 0, fat: 0 });
-          setNutrition(totals);
+          // Calculate Totals
+          if (data.meals) {
+            const totals = data.meals.reduce((acc, meal) => {
+              acc.kcal += meal.kcal;
+              acc.prot += meal.prot;
+              acc.carb += meal.carb;
+              acc.fat += meal.fat;
+              return acc;
+            }, { kcal: 0, prot: 0, carb: 0, fat: 0 });
+            setNutrition(totals);
 
-          // Set User Ratings from Backend Response
-          const ratingsMap = {};
-          data.meals.forEach(m => {
-            // menuService maps 'user_rating' to 'userRating'
-            if (m.userRating > 0) ratingsMap[m.id] = m.userRating;
-          });
-          setUserRatings(ratingsMap);
+            // Set User Ratings from Backend Response
+            const ratingsMap = {};
+            data.meals.forEach(m => {
+              // menuService maps 'user_rating' to 'userRating'
+              if (m.userRating > 0) ratingsMap[m.id] = m.userRating;
+            });
+            setUserRatings(ratingsMap);
+          }
+
+          // Fetch Comments for this Menu
+          if (data.menu_id) {
+            const commentsData = await getComments(data.menu_id);
+            setComments(commentsData);
+          }
+        } else {
+          // No menu, clear dependent states
+          setComments([]);
+          setNutrition({ kcal: 0, prot: 0, carb: 0, fat: 0 });
         }
-
-        // Fetch Comments for this Menu
-        if (data.menu_id) {
-          const commentsData = await getComments(data.menu_id);
-          setComments(commentsData);
+      } catch (error) {
+        if (error.name !== 'CanceledError') {
+          console.error("Menu fetch error:", error);
+          // Optional: Handle other errors
         }
-      } else {
-        // No menu, clear dependent states
-        setComments([]);
-        setNutrition({ kcal: 0, prot: 0, carb: 0, fat: 0 });
       }
     };
     fetchMenuAndAuth();
     setFlippedCards({});
+
+    return () => {
+      abortController.abort();
+    }
   }, [currentDate]);
 
   // --- Helpers ---
