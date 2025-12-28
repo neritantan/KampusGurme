@@ -4,7 +4,7 @@ import {
     PieChart, Pie, Cell, Legend
 } from 'recharts';
 import {
-    TrendingUp, Users, Star, AlertTriangle, ArrowUp, ArrowDown, PieChart as PieIcon, Calendar
+    TrendingUp, Users, Star, AlertTriangle, ArrowUp, ArrowDown, PieChart as PieIcon, Calendar, Sparkles, ArrowRight, ChefHat
 } from 'lucide-react';
 
 import { getDashboardStats, getDashboardAnalytics } from '../../services/dashboardService';
@@ -119,7 +119,7 @@ const Dashboard = () => {
             </div>
 
             {/* --- DAILY STATS (Compact Grid) --- */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
 
                 {/* 1. Daily Votes */}
                 <div style={cardStyle}>
@@ -243,7 +243,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Pie Chart */}
-                <div style={{ ...cardStyle, height: '200px', flexDirection: 'row', alignItems: 'center' }}>
+                <div style={{ ...cardStyle, height: '170px', flexDirection: 'row', alignItems: 'center' }}>
                     <div style={{ flex: 1, height: '100%', position: 'relative' }}>
                         {loadingAnalytics ? <LoadingPlaceholder /> : (
                             <ResponsiveContainer width="100%" height="100%">
@@ -294,6 +294,9 @@ const Dashboard = () => {
                 </div>
 
             </div>
+
+            {/* AI Agent Placeholder */}
+            <AIAgentCard />
         </div>
     );
 };
@@ -373,6 +376,114 @@ const getScoreBg = (score) => {
     if (score >= 80) return 'rgba(48, 209, 88, 0.15)';
     if (score >= 50) return 'rgba(255, 159, 10, 0.15)';
     return 'rgba(255, 69, 58, 0.15)';
+};
+
+// AI Agent Placeholder Card
+const AIAgentCard = () => {
+    return (
+        <div style={{
+            position: 'relative',
+            borderRadius: '24px',
+            background: '#1C1C1E', // Inner card background
+            padding: '20px',
+            marginTop: '10px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px'
+        }}>
+            {/* Top Section: Logo & Text */}
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                {/* Logo Area (Chef Hat Icon) */}
+                <div style={{
+                    width: '60px', height: '60px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #3f2b96, #a8c0ff)', // Purple-Blue Gradient
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: 'inset 0 0 10px rgba(0,0,0,0.3), 0 5px 15px rgba(63, 43, 150, 0.4)'
+                }}>
+                    <ChefHat size={32} color="white" strokeWidth={1.5} />
+                </div>
+
+                {/* Text Area */}
+                <div style={{ flex: 1 }}>
+                    <h3 style={{
+                        fontSize: '22px',
+                        fontWeight: '800',
+                        margin: 0,
+                        background: 'linear-gradient(90deg, #fff, #a8c0ff)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        letterSpacing: '-0.5px'
+                    }}>
+                        GurmeBot
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#888', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                        Yapay zeka ile kampüs menüleri ve öğrenci yorumlarını analiz et.
+                    </p>
+                </div>
+            </div>
+
+            {/* Bottom Section: Separated Input & Button */}
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+
+                {/* Input with Gradient Border */}
+                <div style={{
+                    flex: 1,
+                    position: 'relative',
+                    borderRadius: '30px',
+                    padding: '2px', // Width of gradient border
+                }}>
+                    {/* Gradient Background for Border */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        borderRadius: '30px',
+                        background: 'linear-gradient(45deg, #a8c0ff, #3f2b96, #ff00cc, #33ccff)',
+                        backgroundSize: '300% 300%',
+                        animation: 'gradientAnimation 3s ease infinite',
+                        zIndex: 0
+                    }}></div>
+
+                    <style>{`
+                        @keyframes gradientAnimation {
+                            0% { background-position: 0% 50%; }
+                            50% { background-position: 100% 50%; }
+                            100% { background-position: 0% 50%; }
+                        }
+                    `}</style>
+
+                    {/* Inner Input */}
+                    <div style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        background: '#2C2C2E',
+                        borderRadius: '28px',
+                        padding: '12px 20px',
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}>
+                        <input
+                            type="text"
+                            placeholder="Bu günkü yemekler hakkında öğrenciler ne düşünüyor?"
+                            style={{ background: 'transparent', border: 'none', color: 'white', width: '100%', outline: 'none', fontSize: '13px' }}
+                        />
+                    </div>
+                </div>
+
+                <div style={{
+                    width: '48px', height: '48px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #fff, #bbb)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(255,255,255,0.2)'
+                }}>
+                    <ArrowUp size={24} color="#1C1C1E" strokeWidth={3} />
+                </div>
+            </div>
+        </div>
+    );
 };
 
 // Pie Chart Label (Percentage)
