@@ -25,23 +25,14 @@ class MealSerializer(serializers.ModelSerializer):
         fields = ['meal_id', 'name', 'description', 'image_url', 'category', 'mealnutrition', 'rating', 'user_rating']
 
     def get_rating(self, obj):
-        from django.db.models import Avg
-        menu_id = self.context.get('menu_id')
-        if not menu_id:
-             return 0 # Fallback
-             
-        ratings = ItemRating.objects.filter(meal=obj, menu_id=menu_id) # Filter by Meal AND Menu
-        avg = ratings.aggregate(Avg('rating'))['rating__avg']
-        return round(avg, 1) if avg else 0
+        # OPTIMIZED: Get from context map instead of DB query
+        avg_ratings_map = self.context.get('avg_ratings_map', {})
+        return avg_ratings_map.get(obj.meal_id, 0)
 
     def get_user_rating(self, obj):
-        request = self.context.get('request')
-        menu_id = self.context.get('menu_id')
-
-        if request and request.user.is_authenticated and menu_id:
-            rating_obj = ItemRating.objects.filter(user=request.user, meal=obj, menu_id=menu_id).first()
-            return rating_obj.rating if rating_obj else 0
-        return 0
+        # OPTIMIZED: Get from context map instead of DB query
+        user_ratings_map = self.context.get('user_ratings_map', {})
+        return user_ratings_map.get(obj.meal_id, 0)
 
 class DailyMenuSerializer(serializers.ModelSerializer):
     meals = serializers.SerializerMethodField()
@@ -49,7 +40,9 @@ class DailyMenuSerializer(serializers.ModelSerializer):
         model = DailyMenu
         fields = ['menu_id', 'menu_date', 'meals']
     def get_meals(self, obj):
-        menu_contents = MenuContent.objects.filter(menu=obj) 
+        # OPTIMIZATION: Use select_related to fetch meal and its relations in one go
+        # Added .order_by('meal__category__category_id') to fix random ordering issue
+        menu_contents = MenuContent.objects.filter(menu=obj).select_related('meal', 'meal__category', 'meal__mealnutrition').order_by('meal__category__category_id')
         meals = [content.meal for content in menu_contents] 
         # Pass request AND menu_id to MealSerializer context
         context = self.context.copy()

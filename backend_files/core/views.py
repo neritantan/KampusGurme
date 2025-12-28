@@ -26,9 +26,34 @@ class TodayMenuView(APIView):
 
     def get_menu_response(self, date_obj): # new function for getting menu DRY
         try:
+            from .models import DailyMenu, ItemRating
+            from django.db.models import Avg
+            
             menu = DailyMenu.objects.get(menu_date=date_obj)
-            menu = DailyMenu.objects.get(menu_date=date_obj)
-            serializer = DailyMenuSerializer(menu, context={'request': self.request})
+            
+            # --- OPTIMIZATION START ---
+            
+            # 1. Pre-fetch Average Ratings for ALL meals in this menu
+            # Result: { meal_id: 4.5, meal_id_2: 3.2, ... }
+            avg_ratings = ItemRating.objects.filter(menu=menu).values('meal').annotate(avg_rating=Avg('rating'))
+            avg_ratings_map = {item['meal']: round(item['avg_rating'], 1) for item in avg_ratings}
+
+            # 2. Pre-fetch User Ratings for ALL meals in this menu (if logged in)
+            # Result: { meal_id: 5, meal_id_2: 3, ... }
+            user_ratings_map = {}
+            if self.request.user.is_authenticated:
+                user_ratings = ItemRating.objects.filter(menu=menu, user=self.request.user).values('meal', 'rating')
+                user_ratings_map = {item['meal']: item['rating'] for item in user_ratings}
+
+            # --- OPTIMIZATION END ---
+
+            context = {
+                'request': self.request,
+                'avg_ratings_map': avg_ratings_map,
+                'user_ratings_map': user_ratings_map
+            }
+            
+            serializer = DailyMenuSerializer(menu, context=context)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except DailyMenu.DoesNotExist:
             return Response(
