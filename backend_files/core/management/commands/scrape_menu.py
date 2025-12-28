@@ -11,10 +11,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # --- 1. KATEGORİLERİ İNGİLİZCE (GENEL) OLUŞTUR ---
         # Artık "Tatlı" kategorisine Ayran girmeyecek, hepsi "other" olacak.
-        cat_soup, _ = Category.objects.get_or_create(name="soup")
-        cat_main, _ = Category.objects.get_or_create(name="main")
-        cat_side, _ = Category.objects.get_or_create(name="side")
-        cat_other, _ = Category.objects.get_or_create(name="other")
+        cat_soup, _ = Category.objects.get_or_create(name="Çorba")
+        cat_main, _ = Category.objects.get_or_create(name="Ana Yemek")
+        cat_side, _ = Category.objects.get_or_create(name="Yardımcı Yemek")
+        cat_other, _ = Category.objects.get_or_create(name="Diğer")
 
         # --- 2. SİTEYE BAĞLAN ---
         url = "https://www.sivas.edu.tr/yemek-listesi"
@@ -117,4 +117,4 @@ class Command(BaseCommand):
                         valid_item_index += 1
                         count += 1
 
-        self.stdout.write(self.style.SUCCESS(f'✅ İŞLEM TAMAM! {count} yemek eklendi. Kategoriler: soup, main, side, other.'))
+        self.stdout.write(self.style.SUCCESS(f'✅ İŞLEM TAMAM! {count} yemek eklendi. Kategoriler: Çorba, Ana Yemek, Yardımcı Yemek, Diğer.'))
