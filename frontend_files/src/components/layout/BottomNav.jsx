@@ -13,6 +13,9 @@ const BottomNav = () => {
       <NavLink to="/stats" className={({ isActive }) => `nav-icon ${isActive ? 'active' : ''}`}>
         <i className="fa-solid fa-trophy"></i>
       </NavLink>
+      <NavLink to="/dashboard" className={({ isActive }) => `nav-icon ${isActive ? 'active' : ''}`}>
+        <i className="fa-solid fa-chart-pie"></i>
+      </NavLink>
       <NavLink to="/profile" className={({ isActive }) => `nav-icon ${isActive ? 'active' : ''}`}>
         <i className="fa-solid fa-user"></i>
       </NavLink>

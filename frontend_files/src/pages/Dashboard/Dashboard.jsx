@@ -97,26 +97,24 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', padding: '15px', paddingBottom: '90px', background: '#121212', fontFamily: 'Inter, sans-serif', color: 'white', overflowY: 'auto' }}>
+        <section className="screen">
 
-            {/* Compact Header */}
-            <div style={{ ...compactHeaderStyle, marginBottom: '20px' }}>
-                <div>
-                    <h1 style={{ fontSize: '22px', fontWeight: '800', margin: 0, letterSpacing: '-0.5px' }}>
-                        <span style={{ color: 'white' }}>Kampüs</span><span style={{ color: primaryColor }}>Gurme</span>
-                    </h1>
+            {/* Header */}
+            <header className="header">
+                <div className="brand-logo" style={{ fontSize: '1.5rem' }}>
+                    Kampüs<span>Gurme</span>
                 </div>
 
                 {/* Date Picker (Compact) */}
-                <div style={{ display: 'flex', alignItems: 'center', background: '#202022', padding: '4px 8px', borderRadius: '10px', border: '1px solid #333' }}>
+                <div style={{ display: 'flex', alignItems: 'center', background: '#2C2C2E', padding: '4px 8px', borderRadius: '10px', border: '1px solid #333' }}>
                     <input
                         type="date"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '13px', outline: 'none', fontWeight: '600' }}
+                        style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '13px', outline: 'none', fontWeight: '600', fontFamily: 'Outfit, sans-serif' }}
                     />
                 </div>
-            </div>
+            </header>
 
             {/* --- DAILY STATS (Compact Grid) --- */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
@@ -297,7 +295,7 @@ const Dashboard = () => {
 
             {/* AI Agent Placeholder */}
             <AIAgentCard />
-        </div>
+        </section>
     );
 };
 
