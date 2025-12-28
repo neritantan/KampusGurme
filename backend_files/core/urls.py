@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken, MenuByDateView, MonthlyMenuMainDishesView, CommentView, RatingView, VoteCommentView, LeaderboardView, UserActivityView
+from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken, MenuByDateView, MonthlyMenuMainDishesView, CommentView, RatingView, VoteCommentView, LeaderboardView, UserActivityView, DashboardStatsView, DashboardAnalyticsView
 
 urlpatterns = [
     #Get Menus
@@ -23,4 +23,8 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/check/', CheckAuthView.as_view(), name='check_auth'),
     path('auth/csrf/', GetCSRFToken.as_view(), name='get_csrf'),
+    
+    # Dashboard Endpoints
+    path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
+    path('dashboard/analytics/', DashboardAnalyticsView.as_view(), name='dashboard_analytics'),
 ]
