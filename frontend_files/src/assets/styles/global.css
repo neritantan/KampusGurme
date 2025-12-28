@@ -604,7 +604,8 @@ body {
 }
 
 .p-block {
-  width: 80px;
+  width: 110px;
+  /* Increased from 80px */
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   background: linear-gradient(to bottom, #2C2C2E, #151516);
@@ -616,39 +617,52 @@ body {
 }
 
 .p-1 .p-block {
-  height: 130px;
-  width: 100px;
+  height: 140px;
+  /* Slight increase */
+  width: 140px;
+  /* Increased from 100px */
   background: linear-gradient(to bottom, rgba(255, 214, 10, 0.1), #151516);
   border-top: 2px solid var(--gold);
 }
 
 .p-2 .p-block {
-  height: 90px;
+  height: 110px;
   border-top: 2px solid var(--silver);
 }
 
 .p-3 .p-block {
-  height: 70px;
+  height: 90px;
   border-top: 2px solid var(--bronze);
 }
 
-.p-rank {
-  font-size: 2rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.1);
+.p-rank-xp {
   position: absolute;
   bottom: 5px;
+  font-size: 0.75rem;
+  color: #666;
 }
 
 .p-name {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  /* Larger Name */
+  font-weight: 800;
   margin-top: 5px;
+  text-align: center;
+  line-height: 1.2;
+  color: white;
+  margin-bottom: 2px;
 }
 
-.p-xp {
-  font-size: 0.7rem;
+.p-badge-title {
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--primary);
+  text-align: center;
+}
+
+.p-level-info {
+  font-size: 0.7rem;
+  color: #888;
   font-weight: 600;
 }
 

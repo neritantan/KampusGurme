@@ -55,7 +55,7 @@ const Leaderboard = () => {
                 <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Şampiyonlar<span>Ligi</span></div>
             </header>
 
-            <div className="sub-title"><span>🏆 Haftanın Liderleri</span></div>
+
 
             {leaders.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px', color: '#777' }}>Henüz sıralama oluşmadı. İlk puanı sen kazan!</div>
@@ -71,10 +71,9 @@ const Leaderboard = () => {
                                     </div>
                                     <div className="p-block">
                                         <div className="p-name">{getLeader(1).username}</div>
-                                        <div className="p-xp" style={{ color: 'var(--primary)', fontWeight: '800' }}>
-                                            {getLeader(1).badge} <span style={{ fontSize: '0.6rem', color: '#666' }}>(Lvl {getLeader(1).rank_level || 0})</span>
-                                        </div>
-                                        <div className="p-rank" style={{ fontSize: '0.8rem', color: '#666' }}>{getLeader(1).xp} XP</div>
+                                        <div className="p-badge-title">{getLeader(1).badge}</div>
+                                        <div className="p-level-info">Lvl {getLeader(1).rank_level || 0}</div>
+                                        <div className="p-rank-xp">{getLeader(1).xp} XP</div>
                                     </div>
                                 </>
                             )}
@@ -88,11 +87,10 @@ const Leaderboard = () => {
                                         {getLeader(0).avatar_initial}
                                     </div>
                                     <div className="p-block">
-                                        <div className="p-name">{getLeader(0).username}</div>
-                                        <div className="p-xp" style={{ color: 'var(--primary)', fontWeight: '800', fontSize: '1.2rem' }}>
-                                            {getLeader(0).badge} <span style={{ fontSize: '0.7rem', color: '#888' }}>(Lvl {getLeader(0).rank_level || 0})</span>
-                                        </div>
-                                        <div className="p-rank" style={{ fontSize: '0.9rem', color: '#888' }}>{getLeader(0).xp} XP</div>
+                                        <div className="p-name" style={{ fontSize: '1.1rem' }}>{getLeader(0).username}</div>
+                                        <div className="p-badge-title" style={{ fontSize: '0.9rem' }}>{getLeader(0).badge}</div>
+                                        <div className="p-level-info">Lvl {getLeader(0).rank_level || 0}</div>
+                                        <div className="p-rank-xp">{getLeader(0).xp} XP</div>
                                     </div>
                                 </>
                             )}
@@ -106,10 +104,9 @@ const Leaderboard = () => {
                                     </div>
                                     <div className="p-block">
                                         <div className="p-name">{getLeader(2).username}</div>
-                                        <div className="p-xp" style={{ color: 'var(--primary)', fontWeight: '800' }}>
-                                            {getLeader(2).badge} <span style={{ fontSize: '0.6rem', color: '#666' }}>(Lvl {getLeader(2).rank_level || 0})</span>
-                                        </div>
-                                        <div className="p-rank" style={{ fontSize: '0.8rem', color: '#666' }}>{getLeader(2).xp} XP</div>
+                                        <div className="p-badge-title">{getLeader(2).badge}</div>
+                                        <div className="p-level-info">Lvl {getLeader(2).rank_level || 0}</div>
+                                        <div className="p-rank-xp">{getLeader(2).xp} XP</div>
                                     </div>
                                 </>
                             )}

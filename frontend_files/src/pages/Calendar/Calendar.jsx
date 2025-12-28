@@ -68,7 +68,7 @@ const Calendar = () => {
     return (
         <section className="screen">
             <header className="header">
-                <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Yemek<span>Ajandası</span></div>
+                <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Aylık <span>Takvim</span></div>
             </header>
             <div style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '15px', color: 'var(--text-muted)' }}>Aralık 2025</div>
 
