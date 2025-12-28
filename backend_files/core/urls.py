@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken, MenuByDateView, MonthlyMenuMainDishesView, CommentView, RatingView, VoteCommentView
+from .views import TodayMenuView, RegisterView, LoginView, LogoutView, CheckAuthView, GetCSRFToken, MenuByDateView, MonthlyMenuMainDishesView, CommentView, RatingView, VoteCommentView, LeaderboardView, UserActivityView
 
 urlpatterns = [
     #Get Menus
@@ -12,6 +12,10 @@ urlpatterns = [
     path('menu/<int:menu_id>/comment/', CommentView.as_view(), name='menu_comment'),
     path('menu/<int:menu_id>/rate/', RatingView.as_view(), name='menu_rate'),
     path('social/vote/<int:comment_id>/', VoteCommentView.as_view(), name='comment_vote'),
+    path('social/leaderboard/', LeaderboardView.as_view(), name='leaderboard'),
+
+    # User Data
+    path('user/activity/', UserActivityView.as_view(), name='user_activity'),
 
     # Auth Endpoints
     path('auth/register/', RegisterView.as_view(), name='register'),

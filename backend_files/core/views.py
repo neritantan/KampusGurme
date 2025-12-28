@@ -27,7 +27,8 @@ class TodayMenuView(APIView):
     def get_menu_response(self, date_obj): # new function for getting menu DRY
         try:
             menu = DailyMenu.objects.get(menu_date=date_obj)
-            serializer = DailyMenuSerializer(menu)
+            menu = DailyMenu.objects.get(menu_date=date_obj)
+            serializer = DailyMenuSerializer(menu, context={'request': self.request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except DailyMenu.DoesNotExist:
             return Response(
@@ -66,7 +67,7 @@ class MonthlyMenuMainDishesView(APIView): # for calender view
 
             main_dish_content = MenuContent.objects.filter(
                 menu=menu,
-                meal__category__name="main" 
+                meal__category__name__in=["Ana Yemek", "main"] 
             ).select_related('meal').first()
 
             if main_dish_content:
@@ -161,7 +162,7 @@ class CommentView(APIView):
     def get(self, request, menu_id): # get comments for a specific menu
 
         comments = UserComment.objects.filter(menu_id=menu_id).order_by('-upvotes', '-created_at')
-        serializer = UserCommentSerializer(comments, many=True)
+        serializer = UserCommentSerializer(comments, many=True, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, menu_id): # post a comment
@@ -271,12 +272,68 @@ class VoteCommentView(APIView):
             
             if vote_type == 'UP':
                 comment.upvotes = F('upvotes') + 1
-                # Give XP to comment owner (Check: Don't give XP to self)
-                if comment.user and comment.user != request.user:
+                # Give XP to comment owner
+                if comment.user and comment.user != request.user: 
                     comment.user.add_xp('RECEIVE_UPVOTE')
             else:
                 comment.downvotes = F('downvotes') + 1
-            
+
             comment.save()
             comment.refresh_from_db()
             return Response({"status": "created", "upvotes": comment.upvotes, "downvotes": comment.downvotes}, status=status.HTTP_201_CREATED)
+
+# Leaderboard View
+class LeaderboardView(APIView):
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        # Top 20 users by XP
+        from .models import User
+        users = User.objects.order_by('-total_xp')[:20]
+        data = []
+        for i, user in enumerate(users):
+            data.append({
+                "rank": i + 1,
+                "username": user.username,
+                "xp": user.total_xp,
+                "badge": user.rank.rank_name if user.rank else "Çaylak",
+                "avatar_initial": user.username[0].upper() if user.username else "?"
+            })
+        return Response(data, status=status.HTTP_200_OK)
+
+# User Activity View (Profile)
+class UserActivityView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        
+        # 1. User Comments
+        comments = UserComment.objects.filter(user=user).select_related('subject_meal').order_by('-created_at')
+        comments_data = []
+        for c in comments:
+            comments_data.append({
+                "id": c.comment_id,
+                "text": c.comment_text,
+                "target": c.subject_meal.name if c.subject_meal else "Genel",
+                "date": c.created_at.date(), # Format handled by DRF usually but manual here
+                "upvotes": c.upvotes,
+                "downvotes": c.downvotes
+            })
+
+        # 2. User Ratings
+        ratings = ItemRating.objects.filter(user=user).select_related('meal').order_by('-created_at')
+        ratings_data = []
+        for r in ratings:
+            ratings_data.append({
+                "id": r.rating_id,
+                "name": r.meal.name if r.meal else "Bilinmeyen Yemek",
+                "rating": r.rating,
+                "date": r.created_at.date(),
+                "img": r.meal.image_url if r.meal else ""
+            })
+
+        return Response({
+            "comments": comments_data,
+            "ratings": ratings_data
+        }, status=status.HTTP_200_OK)

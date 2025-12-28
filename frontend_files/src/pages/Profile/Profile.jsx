@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkAuth, logout } from '../../services/authService';
+import { getUserActivity } from '../../services/socialService';
 import GuestWarning from '../../components/layout/GuestWarning';
 
 const Profile = () => {
@@ -13,6 +14,10 @@ const Profile = () => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(true);
 
+    // Dynamic Data
+    const [myComments, setMyComments] = useState([]);
+    const [ratedMeals, setRatedMeals] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
             const authData = await checkAuth();
@@ -20,22 +25,18 @@ const Profile = () => {
                 setIsAuthenticated(false);
             } else {
                 setUser(authData);
+                // Fetch Activity
+                try {
+                    const activity = await getUserActivity();
+                    setMyComments(activity.comments);
+                    setRatedMeals(activity.ratings);
+                } catch (err) {
+                    console.error("Failed to load activity", err);
+                }
             }
         };
         fetchData();
     }, []);
-
-    // Kullanıcının Yorumları (MOCK - Backend henüz desteklemiyor)
-    const [myComments, setMyComments] = useState([
-        { id: 1, text: 'Tavuk biraz kuruydu ama pilav efsane.', target: 'Fırın Tavuk', date: '2025-12-26', upvotes: 12, downvotes: 2 },
-        { id: 2, text: 'Bugünkü menü tam sporcu işi!', target: 'Genel', date: '2025-12-25', upvotes: 45, downvotes: 0 },
-    ]);
-
-    // Kullanıcının Puanladığı Yemekler (MOCK)
-    const [ratedMeals, setRatedMeals] = useState([
-        { id: 1, name: 'Fırın Tavuk & Pilav', rating: 4, date: '2025-12-26', img: 'https://cdn.yemek.com/mnresize/1250/833/uploads/2016/09/firin-tavuk-yemekcom.jpg' },
-        { id: 2, name: 'Yayla Çorbası', rating: 2, date: '2025-12-20', img: 'https://cdn.yemek.com/mnresize/1250/833/uploads/2014/06/yayla-corbasi-yemekcom.jpg' },
-    ]);
 
     // --- STATE'LER ---
     const [activeTab, setActiveTab] = useState('comments');

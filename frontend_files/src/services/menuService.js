@@ -22,7 +22,8 @@ export const getDailyMenu = async (dateObj) => {
       id: meal.meal_id,
       name: meal.name,
       category: (meal.category && meal.category.name) ? meal.category.name : "Diğer",
-      rating: (Math.random() * 2 + 3).toFixed(1), // Rating yine random şimdilik
+      rating: meal.rating ? parseFloat(meal.rating).toFixed(1) : "0.0", // Real average rating
+      userRating: meal.user_rating || 0, // Real user rating (if logged in)
       kcal: meal.mealnutrition ? meal.mealnutrition.calories : 0,
       prot: meal.mealnutrition ? meal.mealnutrition.protein : 0,
       carb: meal.mealnutrition ? meal.mealnutrition.carbs : 0,

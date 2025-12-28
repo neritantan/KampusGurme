@@ -8,7 +8,7 @@ const CommentsModal = ({ isOpen, onClose, menuMeals, onAddComment }) => {
 
     const handleSubmit = () => {
         if (!text.trim()) return;
-        
+
         // Hedef ismini bul
         let targetName = "Genel";
         if (target !== 'general') {
@@ -16,18 +16,12 @@ const CommentsModal = ({ isOpen, onClose, menuMeals, onAddComment }) => {
             if (meal) targetName = meal.name;
         }
 
-        // Yeni yorum objesini oluştur
-        const newComment = {
-            id: Date.now(),
-            user: '@ben', // Şimdilik sabit
-            time: 'Şimdi',
+        // Ana sayfaya gönder (API için gerekli veriler)
+        onAddComment({
             text: text,
-            targetName: targetName
-        };
+            mealId: target === 'general' ? null : parseInt(target, 10)
+        });
 
-        // Ana sayfaya gönder
-        onAddComment(newComment);
-        
         // Temizle ve Kapat
         setText('');
         onClose();
@@ -36,22 +30,22 @@ const CommentsModal = ({ isOpen, onClose, menuMeals, onAddComment }) => {
     return (
         <div className="modal-overlay open" onClick={onClose}>
             {/* height: auto yaptık ki ekranı tamamen kaplamasın, sadece input kadar olsun */}
-            <div className="modal-sheet" onClick={e => e.stopPropagation()} style={{height: 'auto', minHeight: '300px'}}>
+            <div className="modal-sheet" onClick={e => e.stopPropagation()} style={{ height: 'auto', minHeight: '300px' }}>
                 <div className="drag-bar" onClick={onClose}></div>
-                
-                <div className="header" style={{marginBottom: '20px'}}>
-                    <div className="brand-logo" style={{fontSize: '1.5rem'}}>Yorum<span>Yap</span></div>
-                    <div onClick={onClose} style={{cursor:'pointer'}}><i className="fa-solid fa-xmark"></i></div>
+
+                <div className="header" style={{ marginBottom: '20px' }}>
+                    <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Yorum<span>Yap</span></div>
+                    <div onClick={onClose} style={{ cursor: 'pointer' }}><i className="fa-solid fa-xmark"></i></div>
                 </div>
 
-                <div style={{background: '#2C2C2E', padding: '15px', borderRadius: '15px', marginBottom: '20px'}}>
-                    <div style={{marginBottom: '15px'}}>
-                        <label style={{fontSize: '0.8rem', color: '#888', display: 'block', marginBottom: '8px', fontWeight:'600'}}>
+                <div style={{ background: '#2C2C2E', padding: '15px', borderRadius: '15px', marginBottom: '20px' }}>
+                    <div style={{ marginBottom: '15px' }}>
+                        <label style={{ fontSize: '0.8rem', color: '#888', display: 'block', marginBottom: '8px', fontWeight: '600' }}>
                             Hangi yemek hakkında?
                         </label>
-                        <select 
-                            className="custom-input" 
-                            style={{padding: '12px', height: 'auto', width: '100%', background:'#1C1C1E', border:'1px solid #444'}}
+                        <select
+                            className="custom-input"
+                            style={{ padding: '12px', height: 'auto', width: '100%', background: '#1C1C1E', border: '1px solid #444' }}
                             value={target}
                             onChange={(e) => setTarget(e.target.value)}
                         >
@@ -62,22 +56,22 @@ const CommentsModal = ({ isOpen, onClose, menuMeals, onAddComment }) => {
                         </select>
                     </div>
 
-                    <div style={{marginBottom: '10px'}}>
-                        <label style={{fontSize: '0.8rem', color: '#888', display: 'block', marginBottom: '8px', fontWeight:'600'}}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <label style={{ fontSize: '0.8rem', color: '#888', display: 'block', marginBottom: '8px', fontWeight: '600' }}>
                             Düşüncelerin:
                         </label>
-                        <textarea 
-                            className="c-input" 
+                        <textarea
+                            className="c-input"
                             rows="4"
-                            placeholder="Tadı nasıldı? Porsiyon yeterli miydi?" 
+                            placeholder="Tadı nasıldı? Porsiyon yeterli miydi?"
                             value={text}
                             onChange={e => setText(e.target.value)}
-                            style={{width: '100%', resize: 'none'}}
+                            style={{ width: '100%', resize: 'none' }}
                         />
                     </div>
 
-                    <button className="btn-primary" onClick={handleSubmit} style={{marginTop: '10px'}}>
-                        Yorumu Paylaş <i className="fa-solid fa-paper-plane" style={{marginLeft:'10px'}}></i>
+                    <button className="btn-primary" onClick={handleSubmit} style={{ marginTop: '10px' }}>
+                        Yorumu Paylaş <i className="fa-solid fa-paper-plane" style={{ marginLeft: '10px' }}></i>
                     </button>
                 </div>
             </div>

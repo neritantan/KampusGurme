@@ -16,9 +16,45 @@ class MealNutritionSerializer(serializers.ModelSerializer):
 class MealSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     mealnutrition = MealNutritionSerializer(read_only=True)
+    
+    rating = serializers.SerializerMethodField()
+    user_rating = serializers.SerializerMethodField()
+
     class Meta:
         model = Meal
-        fields = ['meal_id', 'name', 'description', 'image_url', 'category', 'mealnutrition']
+        fields = ['meal_id', 'name', 'description', 'image_url', 'category', 'mealnutrition', 'rating', 'user_rating']
+
+    def get_rating(self, obj):
+        from django.db.models import Avg
+        # We need the menu_id context to filter ratings correctly for THIS specific daily menu
+        # Because a Meal (e.g. Rice) can appear on multiple dates.
+        # However, ItemRating has FK to 'menu' (DailyMenu) and 'meal'.
+        # We need to filter by the current DailyMenu we are viewing if possible.
+        # But MealSerializer is nested inside DailyMenuSerializer, so we can get menu from context or parent?
+        # Actually ItemRating is specific to a (User, Menu, Meal) tuple.
+        # If we just want general rating of the meal across all time, we filter by meal only.
+        # If we want rating specific to this day ... let's look at ItemRating model.
+        # It has 'menu' FK. So ratings are per-day specific.
+        # We need to know which 'menu' we are serializing right now.
+        
+        # In DailyMenuSerializer.get_meals, we are serializing a list of meals.
+        # We can pass the 'menu_id' in the context to MealSerializer.
+        menu_id = self.context.get('menu_id')
+        if not menu_id:
+             return 0 # Fallback
+             
+        ratings = ItemRating.objects.filter(meal=obj, menu_id=menu_id) # Filter by Meal AND Menu
+        avg = ratings.aggregate(Avg('rating'))['rating__avg']
+        return round(avg, 1) if avg else 0
+
+    def get_user_rating(self, obj):
+        request = self.context.get('request')
+        menu_id = self.context.get('menu_id')
+
+        if request and request.user.is_authenticated and menu_id:
+            rating_obj = ItemRating.objects.filter(user=request.user, meal=obj, menu_id=menu_id).first()
+            return rating_obj.rating if rating_obj else 0
+        return 0
 
 class DailyMenuSerializer(serializers.ModelSerializer):
     meals = serializers.SerializerMethodField()
@@ -27,8 +63,11 @@ class DailyMenuSerializer(serializers.ModelSerializer):
         fields = ['menu_id', 'menu_date', 'meals']
     def get_meals(self, obj):
         menu_contents = MenuContent.objects.filter(menu=obj) 
-        meals = [content.meal for content in menu_contents] # get all the meals from specific MenuContent record
-        return MealSerializer(meals, many=True).data # all in one
+        meals = [content.meal for content in menu_contents] 
+        # Pass request AND menu_id to MealSerializer context
+        context = self.context.copy()
+        context['menu_id'] = obj.menu_id
+        return MealSerializer(meals, many=True, context=context).data
 
 # work in progress for user interactions and other things
 
@@ -68,18 +107,28 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserCommentSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(source='user.username', read_only=True)
+    user_vote = serializers.SerializerMethodField()
 
     class Meta:
 
         model = UserComment
         
-        fields = ['comment_id', 'username', 'menu', 'subject_meal', 'comment_text', 'upvotes', 'downvotes', 'created_at']
+        fields = ['comment_id', 'username', 'menu', 'subject_meal', 'comment_text', 'upvotes', 'downvotes', 'user_vote', 'created_at']
         read_only_fields = ['comment_id', 'username', 'upvotes', 'downvotes', 'created_at']
         
     
         extra_kwargs = {
             'subject_meal': {'required': False, 'allow_null': True}
         }
+
+    def get_user_vote(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # We need to find if there is a VOte for this comment by this user
+            from .models import CommentVote
+            vote = CommentVote.objects.filter(user=request.user, comment=obj).first()
+            return vote.vote_type if vote else None
+        return None
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
