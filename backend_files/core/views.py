@@ -197,6 +197,7 @@ class RatingView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, menu_id):
+        from django.db.models import Avg
         data = request.data.copy()
         data['menu'] = menu_id
         meal_id = data.get('meal')
@@ -204,12 +205,16 @@ class RatingView(APIView):
         # check if exists
         existing_rating = ItemRating.objects.filter(user=request.user, menu_id=menu_id, meal_id=meal_id).first()
 
+        response_data = None
+        status_code = status.HTTP_200_OK
+
         if existing_rating:
             # update if exists
             serializer = ItemRatingSerializer(existing_rating, data=data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                response_data = serializer.data
+                status_code = status.HTTP_200_OK
         else:
             # create if doesn't exist
             serializer = ItemRatingSerializer(data=data)
@@ -217,8 +222,16 @@ class RatingView(APIView):
                 serializer.save(user=request.user)
 
                 request.user.add_xp('MEAL_RATING') # add xp for rating
-
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                response_data = serializer.data
+                status_code = status.HTTP_201_CREATED
+        
+        if response_data:
+            # Calculate new average
+            ratings = ItemRating.objects.filter(meal_id=meal_id, menu_id=menu_id)
+            avg = ratings.aggregate(Avg('rating'))['rating__avg']
+            new_avg = round(avg, 1) if avg else 0
+            response_data['new_average'] = new_avg
+            return Response(response_data, status=status_code)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

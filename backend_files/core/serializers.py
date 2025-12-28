@@ -26,19 +26,6 @@ class MealSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         from django.db.models import Avg
-        # We need the menu_id context to filter ratings correctly for THIS specific daily menu
-        # Because a Meal (e.g. Rice) can appear on multiple dates.
-        # However, ItemRating has FK to 'menu' (DailyMenu) and 'meal'.
-        # We need to filter by the current DailyMenu we are viewing if possible.
-        # But MealSerializer is nested inside DailyMenuSerializer, so we can get menu from context or parent?
-        # Actually ItemRating is specific to a (User, Menu, Meal) tuple.
-        # If we just want general rating of the meal across all time, we filter by meal only.
-        # If we want rating specific to this day ... let's look at ItemRating model.
-        # It has 'menu' FK. So ratings are per-day specific.
-        # We need to know which 'menu' we are serializing right now.
-        
-        # In DailyMenuSerializer.get_meals, we are serializing a list of meals.
-        # We can pass the 'menu_id' in the context to MealSerializer.
         menu_id = self.context.get('menu_id')
         if not menu_id:
              return 0 # Fallback

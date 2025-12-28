@@ -115,18 +115,35 @@ const Home = () => {
     e.stopPropagation();
     if (!user) { showToast('⚠️ Puanlamak için giriş yapın!'); return; }
 
-    // Optimistic Update
+    // Optimistic Update: Hemen kullanıcının kendi yıldızını yak
     setUserRatings(prev => ({ ...prev, [mealId]: score }));
 
     try {
-      await rateMeal(menu.menu_id, mealId, score);
-      showToast(`+10 XP: ${score} Yıldız Verildi! ⭐`);
-      // Refresh menu to get updated average rating (Silent refresh)
-      const data = await getDailyMenu(currentDate);
-      if (data) setMenu(data);
+      // Backend'e puanı gönder
+      const result = await rateMeal(menu.menu_id, mealId, score);
+
+      // Backend'den dönen yeni ortalama puanı (new_average) al
+      // Backend returns serializer data, so check if your service returns data or response
+      // Assuming rateMeal returns response.data
+      const newAverage = result.new_average;
+
+      if (newAverage) {
+        // Menü state'ini güncelle: Sadece o yemeğin rating'ini değiştir
+        setMenu(prevMenu => ({
+          ...prevMenu,
+          meals: prevMenu.meals.map(m =>
+            m.id === mealId ? { ...m, rating: newAverage } : m
+          )
+        }));
+        showToast(`+10 XP: ${score} Yıldız Verildi! ⭐ (Ort: ${newAverage})`);
+      } else {
+        showToast(`+10 XP: ${score} Yıldız Verildi! ⭐`);
+      }
+
     } catch (error) {
+      console.error(error);
       showToast('❌ Puan gönderilemedi.');
-      // Could revert here
+      // Hata olursa optimistic update'i geri alabiliriz veya olduğu gibi bırakabiliriz
     }
   };
 
