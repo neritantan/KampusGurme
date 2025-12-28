@@ -179,7 +179,9 @@ class CheckAuthView(APIView):
             'email': request.user.email,
             'total_xp': request.user.total_xp,
             'next_rank_xp': next_rank_xp,
-            'rank': request.user.rank.rank_name if request.user.rank else "Peçete" # to show in profile
+            'next_rank_xp': next_rank_xp,
+            'rank': request.user.rank.rank_name if request.user.rank else "Peçete",
+            'rank_level': request.user.rank.rank_id if request.user.rank else 0
         })
 
 ###########################################
@@ -342,10 +344,32 @@ class LeaderboardView(APIView):
                 "rank": i + 1,
                 "username": user.username,
                 "xp": user.total_xp,
+                "xp": user.total_xp,
                 "badge": user.rank.rank_name if user.rank else "Çaylak",
+                "rank_level": user.rank.rank_id if user.rank else 0,
                 "avatar_initial": user.username[0].upper() if user.username else "?"
             })
-        return Response(data, status=status.HTTP_200_OK)
+            
+        # --- Self Rank Calculation ---
+        self_data = None
+        if request.user.is_authenticated:
+            my_xp = request.user.total_xp
+            # Rank is count of people with strictly more XP + 1
+            my_rank = User.objects.filter(total_xp__gt=my_xp).count() + 1
+            
+            self_data = {
+                "rank": my_rank,
+                "username": request.user.username,
+                "xp": request.user.total_xp,
+                "badge": request.user.rank.rank_name if request.user.rank else "Çaylak",
+                "rank_level": request.user.rank.rank_id if request.user.rank else 0,
+                "avatar_initial": request.user.username[0].upper() if request.user.username else "?"
+            }
+
+        return Response({
+            "leaders": data,
+            "self": self_data
+        }, status=status.HTTP_200_OK)
 
 # User Activity View (Profile)
 class UserActivityView(APIView):

@@ -9,7 +9,8 @@ const Profile = () => {
     const [user, setUser] = useState({
         username: '...',
         rank: '...',
-        total_xp: 0
+        total_xp: 0,
+        next_rank_xp: 100 // Default to avoid division by zero visually until loaded
     });
 
     const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -97,7 +98,31 @@ const Profile = () => {
                     </div>
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'white', marginTop: '10px' }}>{user.username}</div>
-                <div style={{ fontSize: '1rem', color: '#888', fontWeight: '600', marginTop: '5px' }}>{user.rank}</div>
+                <div style={{ fontSize: '1rem', color: '#888', fontWeight: '600', marginTop: '5px', marginBottom: '15px' }}>
+                    {user.rank} <span style={{ fontSize: '0.8rem', color: '#666', fontWeight: '400' }}>(Lvl {user.rank_level || 0})</span>
+                </div>
+
+                {/* --- XP PROGRESS BAR --- */}
+                <div style={{ width: '80%', maxWidth: '300px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#aaa', marginBottom: '5px', fontWeight: '600' }}>
+                        <span>Lvl İlerlemesi</span>
+                        <span>{user.total_xp} / {user.next_rank_xp || 'MAX'} XP</span>
+                    </div>
+                    <div style={{ width: '100%', height: '10px', background: '#333', borderRadius: '10px', overflow: 'hidden', border: '1px solid #444' }}>
+                        <div style={{
+                            width: `${user.next_rank_xp ? Math.min((user.total_xp / user.next_rank_xp) * 100, 100) : 100}%`,
+                            height: '100%',
+                            background: 'linear-gradient(90deg, var(--primary) 0%, #FFD60A 100%)',
+                            borderRadius: '10px',
+                            transition: 'width 0.5s ease-out'
+                        }}></div>
+                    </div>
+                    {user.next_rank_xp && (
+                        <div style={{ textAlign: 'right', fontSize: '0.7rem', color: '#666', marginTop: '4px' }}>
+                            Sonraki rütbeye {user.next_rank_xp - user.total_xp} XP kaldı
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* --- SEKMELER (TABS) --- */}
