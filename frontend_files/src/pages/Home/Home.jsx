@@ -4,6 +4,7 @@ import { getDailyMenu } from '../../services/menuService';
 import { getCsrfToken, checkAuth, logout } from '../../services/authService';
 import { getComments, rateMeal, voteComment, postComment } from '../../services/socialService';
 import CommentsModal from '../../components/modals/CommentsModal';
+import NutritionRow from '../../components/home/NutritionRow';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -81,15 +82,30 @@ const Home = () => {
   const getCategoryStyle = (category) => {
     if (!category) return { icon: 'fa-circle-question', color: '#8E8E93', bg: '#2C2C2E' };
     const cat = category.toLowerCase();
+
+    // Çorba - Bowl Hot (Mug Hot)
     if (cat.includes('çorba') || cat.includes('corba') || cat.includes('soup')) return { icon: 'fa-mug-hot', color: '#FF9500', bg: 'rgba(255, 149, 0, 0.15)' };
-    if (cat.includes('ana') || cat.includes('main') || cat.includes('et') || cat.includes('tavuk') || cat.includes('kebab')) return { icon: 'fa-utensils', color: '#FF3B30', bg: 'rgba(255, 59, 48, 0.15)' };
-    if (cat.includes('yardımcı') || cat.includes('side') || cat.includes('pilav') || cat.includes('makarna') || cat.includes('borek') || cat.includes('börek') || cat.includes('erişte')) return { icon: 'fa-bowl-rice', color: '#FFCC00', bg: 'rgba(255, 204, 0, 0.15)' };
-    if (cat.includes('salata') || cat.includes('salad') || cat.includes('cacık') || cat.includes('cacik') || cat.includes('ezme')) return { icon: 'fa-leaf', color: '#34C759', bg: 'rgba(52, 199, 89, 0.15)' };
+
+    // Ana Yemek - Pan Food (Utensils) -> Drumstick Bite
+    if (cat.includes('ana') || cat.includes('main') || cat.includes('et') || cat.includes('tavuk') || cat.includes('kebab')) return { icon: 'fa-drumstick-bite', color: '#FF3B30', bg: 'rgba(255, 59, 48, 0.15)' };
+
+    // Yardımcı - Bowl Food (User Requested)
+    if (cat.includes('yardımcı') || cat.includes('side') || cat.includes('pilav') || cat.includes('makarna') || cat.includes('borek') || cat.includes('börek') || cat.includes('erişte')) return { icon: 'fa-bowl-food', color: '#FFCC00', bg: 'rgba(255, 204, 0, 0.15)' };
+
+    // Salata/Meze - Leaf
+    if (cat.includes('salata') || cat.includes('salad') || cat.includes('cacık') || cat.includes('cacik') || cat.includes('ezme') || cat.includes('turşu')) return { icon: 'fa-leaf', color: '#34C759', bg: 'rgba(52, 199, 89, 0.15)' };
+
+    // Meyve - Apple Whole
     if (cat.includes('meyve') || cat.includes('fruit') || cat.includes('elma') || cat.includes('apple') || cat.includes('mandalina')) return { icon: 'fa-apple-whole', color: '#30B0C7', bg: 'rgba(48, 176, 199, 0.15)' };
+
+    // Tatlı - Cookie Bite
     if (cat.includes('tatlı') || cat.includes('tatli') || cat.includes('dessert') || cat.includes('helva') || cat.includes('puding')) return { icon: 'fa-cookie-bite', color: '#AF52DE', bg: 'rgba(175, 82, 222, 0.15)' };
+
+    // İçecek - Glass Water
     if (cat.includes('içecek') || cat.includes('icecek') || cat.includes('drink') || cat.includes('ayran') || cat.includes('yoğurt')) return { icon: 'fa-glass-water', color: '#007AFF', bg: 'rgba(0, 122, 255, 0.15)' };
-    if (cat.includes('diğer') || cat.includes('other')) return { icon: 'fa-star', color: '#8E8E93', bg: '#2C2C2E' };
-    return { icon: 'fa-circle-question', color: '#8E8E93', bg: '#2C2C2E' };
+
+    // Diğer - Disease (User Requested)
+    return { icon: 'fa-disease', color: '#8E8E93', bg: '#2C2C2E' };
   };
 
   const showToast = (msg) => {
@@ -193,7 +209,7 @@ const Home = () => {
   return (
     <section className="screen">
       <header className="header">
-        <div className="brand-logo" style={{ fontSize: '1.5rem' }}>Kampüs<span>Gurme</span></div>
+        <div className="brand-logo" style={{ fontSize: '2rem' }}>Kampüs<span>Gurme</span></div>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ textAlign: 'right' }}>
@@ -208,23 +224,34 @@ const Home = () => {
             </div>
           </div>
         ) : (
-          <div onClick={() => navigate('/login')} style={{ background: '#333', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
-            Giriş Yap <i className="fa-solid fa-arrow-right-to-bracket" style={{ marginLeft: '5px' }}></i>
+          <div onClick={() => navigate('/login')} style={{ background: 'var(--primary)', color: 'white', padding: '8px 20px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 15px rgba(255, 102, 0, 0.4)' }}>
+            Giriş Yap
           </div>
         )}
       </header>
 
-      <div className="date-nav">
-        <i className="fa-solid fa-chevron-left nav-arrow" onClick={() => handleDateChange(-1)}></i>
-        <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/calendar')}>
-          <div style={{ fontSize: '1.2rem', fontWeight: '800', lineHeight: '1.2' }}>
+      <div className="date-nav" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', marginTop: '10px' }}>
+        {/* Left: Arrows & Day Name */}
+        {/* Left: Arrows & Day Name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}> {/* Reduced gap from 15px */}
+          <div className="nav-arrow-btn" onClick={() => handleDateChange(-1)}>
+            <i className="fa-solid fa-chevron-left"></i>
+          </div>
+
+          {/* Reduced Width (140->120) and Font Size (1.8->1.5) */}
+          <div style={{ fontSize: '1.5rem', fontWeight: '800', lineHeight: '1', color: 'white', minWidth: '120px', textAlign: 'center' }}>
             {currentDate.toLocaleDateString('tr-TR', { weekday: 'long' })}
           </div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            {currentDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+          <div className="nav-arrow-btn" onClick={() => handleDateChange(1)}>
+            <i className="fa-solid fa-chevron-right"></i>
           </div>
         </div>
-        <i className="fa-solid fa-chevron-right nav-arrow" onClick={() => handleDateChange(1)}></i>
+
+        {/* Right: Date */}
+        <div style={{ fontSize: '0.9rem', color: '#666', fontWeight: '600', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }} onClick={() => navigate('/calendar')}>
+          {currentDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -249,13 +276,7 @@ const Home = () => {
                 <div className="flip-card-inner">
                   <div className="flip-card-front">
                     <div className="dish-card" style={{ margin: 0, height: '100%', border: 'none' }}>
-                      <div
-                        style={{
-                          width: '80px', height: '80px', borderRadius: '12px',
-                          background: style.bg, display: 'flex', alignItems: 'center',
-                          justifyContent: 'center', fontSize: '2rem', color: style.color
-                        }}
-                      >
+                      <div className="dish-img">
                         <i className={`fa-solid ${style.icon}`}></i>
                       </div>
 
@@ -264,7 +285,7 @@ const Home = () => {
                           <span className="d-name" style={{ fontSize: '1rem' }}>{meal.name}</span>
                           <span className="d-score">{meal.rating} <i className="fa-solid fa-star" style={{ color: '#FFD60A' }}></i></span>
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: style.color, marginBottom: '5px', fontWeight: '600' }}>{meal.category}</div>
+                        <div className="d-category">{meal.category}</div>
                         <div className="star-row">
                           {[1, 2, 3, 4, 5].map(i => (
                             <i key={i} className={`fa-solid fa-star ${i <= (myRating || Math.round(Number(meal.rating))) ? 'filled' : ''}`}
@@ -293,12 +314,7 @@ const Home = () => {
           }))}
       </div>
 
-      <div style={{ background: 'var(--bg-card)', padding: '20px 15px', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', marginTop: '10px', border: '1px solid #333' }}>
-        <div style={{ textAlign: 'center' }}><div style={{ color: 'var(--primary)', fontWeight: '800', fontSize: '1.2rem' }}><i className="fa-solid fa-fire"></i> {nutrition.kcal}</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>KCAL</div></div>
-        <div style={{ textAlign: 'center' }}><div style={{ fontWeight: '700', fontSize: '1.1rem' }}>{nutrition.prot}g</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>PROT</div></div>
-        <div style={{ textAlign: 'center' }}><div style={{ fontWeight: '700', fontSize: '1.1rem' }}>{nutrition.carb}g</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>KARB</div></div>
-        <div style={{ textAlign: 'center' }}><div style={{ fontWeight: '700', fontSize: '1.1rem' }}>{nutrition.fat}g</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>YAĞ</div></div>
-      </div>
+      {nutrition.kcal > 0 && <NutritionRow nutrition={nutrition} />}
 
       <div style={{ marginTop: '25px', marginBottom: '50px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -317,7 +333,7 @@ const Home = () => {
           comments.map(c => {
             const date = new Date(c.created_at).toLocaleDateString();
             return (
-              <div key={c.comment_id} style={{ background: '#202022', borderRadius: '15px', padding: '15px', marginBottom: '10px', borderLeft: '3px solid var(--primary)' }}>
+              <div key={c.comment_id} style={{ background: '#1C1C1E', borderRadius: '16px', padding: '16px', marginBottom: '12px', border: '1px solid #2C2C2E', borderLeft: '4px solid var(--primary)', position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#aaa', marginBottom: '5px' }}>
                   <span>@{c.username}</span><span>{date}</span>
                 </div>

@@ -191,16 +191,24 @@ body {
 }
 
 .dish-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  margin-bottom: 15px;
+  background: linear-gradient(145deg, #202022, #18181A);
+  /* Subtle Gradient */
+  border-radius: 20px;
+  padding: 12px;
   display: flex;
   gap: 15px;
   border: 1px solid #2C2C2E;
   position: relative;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, box-shadow 0.2s;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.dish-card:hover {
+  border-color: #3C3C3E;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .dish-card:active {
@@ -210,17 +218,47 @@ body {
 .dish-img {
   width: 70px;
   height: 70px;
-  background: var(--bg-lighter);
-  border-radius: var(--radius-md);
+  background: #252527;
+  /* Dark Grey Background */
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
   color: var(--primary);
+  /* Icon Color can stay or change */
   flex-shrink: 0;
-  background-size: cover;
-  background-position: center;
-  border: 1px solid #333;
+  border: none;
+  /* No border for cleaner look */
+}
+
+/* Nav Arrow Button Style */
+.nav-arrow-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  /* Circle */
+  /* background: rgba(255, 102, 0, 0.1); */
+  /* Optional: subtle bg */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Smooth bouncy effect */
+}
+
+.nav-arrow-btn:active {
+  transform: scale(0.85);
+  /* Click press effect */
+  background: var(--primary);
+  color: white;
+}
+
+.nav-arrow-btn:hover {
+  background: rgba(255, 102, 0, 0.15);
 }
 
 .dish-info {
@@ -234,13 +272,28 @@ body {
 }
 
 .d-name {
+  font-weight: 800;
+  /* Bolder text */
+  font-size: 1.1rem;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.d-category {
+  font-size: 0.8rem;
+  color: #888;
+  /* Standard Grey */
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 .d-score {
-  color: #FFD60A;
-  font-weight: 700;
-  font-size: 0.9rem;
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .star-row {
@@ -906,7 +959,8 @@ body {
 .flip-card {
   background-color: transparent;
   width: 100%;
-  height: 140px;
+  height: 110px;
+  /* Reduced from 140px */
   perspective: 1000px;
   /* 3D derinlik algısı */
   margin-bottom: 15px;
