@@ -383,3 +383,111 @@ class UserActivityView(APIView):
             "comments": comments_data,
             "ratings": ratings_data
         }, status=status.HTTP_200_OK)
+
+# --- DASHBOARD VIEWS ---
+
+class DashboardStatsView(APIView):
+    # Only admins or special users should see this? For now AllowAny
+    permission_classes = (AllowAny, ) 
+
+    def get(self, request):
+        from django.db.models import Avg, Count
+        from django.utils import timezone
+        import datetime
+
+        today = timezone.now().date()
+        yesterday = today - datetime.timedelta(days=1)
+
+        # 1. Total Votes (Today)
+        today_ratings_qs = ItemRating.objects.filter(created_at__date=today)
+        total_votes = today_ratings_qs.count()
+
+        # 2. Average Score (Today)
+        today_avg = today_ratings_qs.aggregate(Avg('rating'))['rating__avg'] or 0
+        today_avg = round(today_avg, 2)
+
+        # 3. Yesterday Comparison
+        yesterday_ratings_qs = ItemRating.objects.filter(created_at__date=yesterday)
+        yesterday_avg = yesterday_ratings_qs.aggregate(Avg('rating'))['rating__avg'] or 0
+        
+        diff_percent = 0
+        if yesterday_avg > 0:
+            diff_percent = ((today_avg - yesterday_avg) / yesterday_avg) * 100
+        elif today_avg > 0:
+            diff_percent = 100 
+        
+        diff_percent = round(diff_percent, 1)
+
+        # 4. Lowest Rated Meal (Today)
+        # Find the meal with lowest avg rating in today's menu
+        worst_meal_data = None
+        try:
+            todays_menu = DailyMenu.objects.filter(menu_date=today).first()
+            if todays_menu:
+                # Find worst meal in this menu
+                worst_meal = ItemRating.objects.filter(menu=todays_menu)\
+                    .values('meal__name', 'meal__image_url')\
+                    .annotate(avg=Avg('rating'))\
+                    .order_by('avg').first()
+                
+                if worst_meal:
+                    worst_meal_data = {
+                        "name": worst_meal['meal__name'],
+                        "score": round(worst_meal['avg'], 1),
+                        "image": worst_meal.get('meal__image_url')
+                    }
+        except Exception:
+            pass
+
+        return Response({
+            "total_votes": total_votes,
+            "today_avg": today_avg,
+            "yesterday_avg": round(yesterday_avg, 2),
+            "diff_percent": diff_percent,
+            "worst_meal": worst_meal_data
+        }, status=status.HTTP_200_OK)
+
+class DashboardAnalyticsView(APIView):
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        from django.db.models import Avg, Count
+        from django.db.models.functions import TruncDate
+        from django.utils import timezone
+        import datetime
+
+        today = timezone.now().date()
+        thirty_days_ago = today - datetime.timedelta(days=30)
+        
+        # 1. Trend Chart (Last 30 Days)
+        # Group by Date, Calculate Avg Rating
+        trend_data = ItemRating.objects.filter(created_at__date__gte=thirty_days_ago)\
+            .values('created_at__date')\
+            .annotate(avg_score=Avg('rating'), count=Count('rating_id'))\
+            .order_by('created_at__date')
+        
+        # Format for frontend [ {date: '2024-10-01', score: 4.2}, ... ]
+        chart_data = []
+        for entry in trend_data:
+            chart_data.append({
+                "date": entry['created_at__date'].strftime('%Y-%m-%d'),
+                "score": round(entry['avg_score'], 1),
+                "votes": entry['count']
+            })
+
+        # 2. Sentiment Distribution (This Month)
+        this_month_start = today.replace(day=1)
+        month_ratings = ItemRating.objects.filter(created_at__date__gte=this_month_start)
+        
+        positive = month_ratings.filter(rating__gte=3).count()
+        negative = month_ratings.filter(rating__lt=3).count()
+        
+        sentiment_data = [
+            {"name": "Pozitif (3+)", "value": positive},
+            {"name": "Negatif (<3)", "value": negative}
+        ]
+
+        return Response({
+            "trend_chart": chart_data,
+            "sentiment_chart": sentiment_data
+        }, status=status.HTTP_200_OK)
