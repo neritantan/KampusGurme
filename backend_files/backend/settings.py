@@ -135,6 +135,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 
 CORS_ALLOWED_ORIGINS = [
+    "https://kampus-gurme.vercel.app",
+    "https://kampusgurme.com.tr",
+    "https://www.kampusgurme.com.tr",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
@@ -142,6 +145,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://kampus-gurme.vercel.app",
+    "https://kampusgurme.com.tr",
+    "https://www.kampusgurme.com.tr",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
